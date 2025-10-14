@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class BasePlugin : MonoBehaviour
+public abstract class BasePlugin : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public PluginData pluginData;
+    public abstract void Effect();
+}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+[CreateAssetMenu(fileName = "PluginData", menuName = "Plugin/PluginData")]
+public class PluginData : ScriptableObject
+{
+    public string objectName;
+    public int number;
+    public string description;
 }
