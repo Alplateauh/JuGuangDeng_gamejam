@@ -1100,12 +1100,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea7849f3f37cbbe4c9e66fbf7cabc4b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveData: {fileID: 11400000, guid: 80ba514e84343ba42aa042af266b6b40, type: 2}
-  lastDashDir: {x: 0, y: 0}
-  IsDashing: 0
-  dashesLeft: 0
-  IsJumping: 0
-  isOnGround: 0
+  movementData: {fileID: 0}
+  isGround: 0
+  faceDir: 0
+  canFlip: 0
+  isJumping: 0
+  isJumpCut: 0
+  jumpParticle: {fileID: 0}
 --- !u!4 &1792113655
 Transform:
   m_ObjectHideFlags: 0
