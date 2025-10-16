@@ -8,14 +8,14 @@ public class Check : MonoBehaviour
     private Player player;
     private PlayerMovementData data;
     
-    // ÔÚ¼ì²éÇøÉèÖÃÕâĞ©
-    [Header("µØÃæ¼ì²â")]
+    // åœ¨æ£€æŸ¥åŒºè®¾ç½®è¿™äº›
+    [Header("åœ°é¢æ£€æµ‹")]
     [SerializeField] private Transform _groundCheckPoint;
-    // µØÃæ¼ì²éµÄ´óĞ¡Í¨³£±È½ÇÉ«¿í¶È£¨ÓÃÓÚµØÃæ£©ºÍ¸ß¶È£¨ÓÃÓÚÇ½±Ú¼ì²é£©ÉÔĞ¡
+    // åœ°é¢æ£€æŸ¥çš„å¤§å°é€šå¸¸æ¯”è§’è‰²å®½åº¦ï¼ˆç”¨äºåœ°é¢ï¼‰å’Œé«˜åº¦ï¼ˆç”¨äºå¢™å£æ£€æŸ¥ï¼‰ç¨å°
     [SerializeField] private Vector2 _groundCheckSize = new Vector2(0.49f, 0.03f);
     [Space(5)]
     
-    [Header("²ãºÍ±êÇ©")]
+    [Header("å±‚å’Œæ ‡ç­¾")]
     [SerializeField] private LayerMask _groundLayer;
 
     private void Start()
@@ -28,10 +28,10 @@ public class Check : MonoBehaviour
     {
         if (!player.isJumping && data != null && player != null) 
         {
-            // µØÃæ¼ì²é
-            if (IsOnGround() && !player.isJumping) // ¼ì²éÉèÖÃµÄ¿òÊÇ·ñÓëµØÃæÖØµş
+            // åœ°é¢æ£€æŸ¥
+            if (IsOnGround() && !player.isJumping) // æ£€æŸ¥è®¾ç½®çš„æ¡†æ˜¯å¦ä¸åœ°é¢é‡å 
             {
-                player.SetTimer(TimerType.LastOnGround, data.coyoteTime); // Èç¹ûÖØµş£¬ÉèÖÃ×îºóµÄµØÃæÊ±¼äÎª coyoteTime
+                player.SetTimer(TimerType.LastOnGround, data.coyoteTime); // å¦‚æœé‡å ï¼Œè®¾ç½®æœ€åçš„åœ°é¢æ—¶é—´ä¸º coyoteTime
             }
         }
     }
