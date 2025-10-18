@@ -19,20 +19,24 @@ public class Player_MoveState : PlayerState
     public override void Update()
     {
         base.Update();
-
+        
         if (player.faceDir == 0) 
             stateMachine.ChangeState(player.idleState);
         
         if (player.isJumping) 
             stateMachine.ChangeState(player.jumpState);
 
+        if (player.isWallMove) 
+            stateMachine.ChangeState(player.wallMoveState);
+
         if (!player.isGround) 
             stateMachine.ChangeState(player.fallState);
     }
-
+    
     public override void FixedUpdate()
     {
         base.FixedUpdate();
+        
         player.Run(1);
     }
     
