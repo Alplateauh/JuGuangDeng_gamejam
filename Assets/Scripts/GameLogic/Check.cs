@@ -18,7 +18,7 @@ public class Check : MonoBehaviour
     [SerializeField] private Transform _frontBlockCheckPoint;
     [SerializeField] private Vector2 _frontBlockCheckSize;
     [SerializeField] private Transform _headBlockCheckPoint;
-    [FormerlySerializedAs("_headtBlockCheckSize")] [SerializeField] private Vector2 _headBlockCheckSize;
+    [SerializeField] private Vector2 _headBlockCheckSize;
     
     [Space(5)]
     [Header("µÿ√ÊÕº≤„")]
@@ -57,7 +57,7 @@ public class Check : MonoBehaviour
 
     private void BlockCheck()
     {
-        if (player.hitBlock) 
+        if (player.isHitBlock) 
         {
             if (FrontBlockCheck())
             {

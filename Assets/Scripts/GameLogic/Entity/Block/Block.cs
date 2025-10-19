@@ -7,14 +7,12 @@ public class Block : MonoBehaviour
 {
     private Collider2D collider;
     private Bounds bounds;
+    private Player player;
     
     public BlockType blockType;
     public Vector2 checkArea;
     public LayerMask playerLayerMask;
     private Vector2[] cornerPos;
-    
-    
-    public Player player;
 
     private void Start()
     {
@@ -43,10 +41,10 @@ public class Block : MonoBehaviour
         // 左下角
         cornerPos[3] = new Vector2(bounds.min.x, bounds.min.y);
 
-        for (int i = 0; i < 4; i++)
-        {
-            Debug.Log("corner" + i + ":" + cornerPos[i].x + ", " + cornerPos[i].y);
-        }
+        // for (int i = 0; i < 4; i++)
+        // {
+        //     Debug.Log("corner" + i + ":" + cornerPos[i].x + ", " + cornerPos[i].y);
+        // }
     }
     
     public Vector2[] GetCornerPos()
@@ -57,22 +55,31 @@ public class Block : MonoBehaviour
     private void HandlePlayerEnter()
     {
         Collider2D playerCol = Physics2D.OverlapBox(this.transform.position, checkArea, 0, playerLayerMask);
-        if (playerCol != null && player.hitBlock == false)
+        
+        if (playerCol != null) 
+            player = playerCol.GetComponent<Player>();
+        
+        if (player != null && player.isHitBlock == false && player.GetTimer(TimerType.LeaveBlockCoolDown) < 0)
         {
-            player.hitBlock = true;
+            player.isHitBlock = true;
             player.block = this;
         }
     }
     
     private void HandlePlayerLeave()
     {
-        Collider2D playerCol = Physics2D.OverlapBox(this.transform.position, checkArea, 0, playerLayerMask);
-        if (playerCol == null && player.hitBlock == true)
+        Collider2D playerCol = Physics2D.OverlapBox(this.transform.position, checkArea, 0f, playerLayerMask);
+        
+        if (playerCol == null)
         {
-            player.hitBlock = false;
-            player.hitSide = 0;
-            player.block = null;
-            player.blockCornerPos = null;
+            if (player != null)
+            {
+                if (player.block == this)
+                {
+                    player.ResetPlayerBlock();
+                }
+                player = null;
+            }
         }
     }
     

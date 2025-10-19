@@ -58,5 +58,7 @@ public class Player_FallState : PlayerState
         base.Exit();
         player.isJumpCut = false;
         //if(player.isGround) player.jumpParticle.Play();
+        
+        //player.hasChanged = false;
     }
 }

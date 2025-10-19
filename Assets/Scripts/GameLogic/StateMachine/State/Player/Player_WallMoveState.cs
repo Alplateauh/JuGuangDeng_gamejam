@@ -27,11 +27,17 @@ public class Player_WallMoveState : PlayerState
         if (player.faceDir == 0) 
             stateMachine.ChangeState(player.idleState);
 
-        if (!player.hitBlock || !player.isWallMove)
+        if (!player.isHitBlock || !player.isWallMove)
             stateMachine.ChangeState(player.fallState);
 
-        if (player.isJumping) 
+        if (player.canJump && player.isJumping)  
             stateMachine.ChangeState(player.jumpState);
+        
+        if (player.canJump && player.isWallJumping && player.isHitBlock) 
+            stateMachine.ChangeState(player.wallJumpState);
+        
+        if (!player.canJump && player.isLeaving && player.isHitBlock) 
+            stateMachine.ChangeState(player.wallLeaveState);
 
         if (player.isRightChange || player.isLeftChange)
             stateMachine.ChangeState(player.changeSideState);
@@ -63,14 +69,6 @@ public class Player_WallMoveState : PlayerState
                 player.transform.localScale =
                     new Vector3(player.transform.localScale.x, -1, player.transform.localScale.z);
                 break;
-        }
-    }
-    
-    private void Gravity()
-    {
-        if (player.hitSide == 4)
-        {
-            player.rb.AddForce(Vector2.up * movementData.gravityScale);
         }
     }
 }

@@ -56,6 +56,8 @@ public class Player_InputHandle : MonoBehaviour
         {
             player.SetTimer(TimerType.LastPressJump, player.movementData.jumpInputBufferTime);
         }
+        player.SetTimer(TimerType.LastPressLeave, player.movementData.leaveInputBufferTime);
+        player.SetTimer(TimerType.LastPressWallJump, player.movementData.leaveInputBufferTime);
     }
     
     private void OnJumpCanceled()

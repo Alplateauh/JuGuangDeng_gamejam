@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
 {
@@ -16,31 +17,33 @@ public class Player : MonoBehaviour
 
     [Header("玩家数据")]
     public PlayerMovementData movementData;
-    [ReadOnly] public bool isGround = false;
+    public float playerHeight;
+    public float playerLength;
+    public bool isGround = false;
 
     #region 地块相关
 
     [Header("地块相关参数")]
-    public float playerHeight;
-    
     public Block block;
     public Vector2[] blockCornerPos;
     public Transform rotatePos;
     public Transform changePos;
-    public bool hitBlock = false;
+    public bool isHitBlock = false; // 是否碰到Block
     public int hitSide; // 代表玩家碰撞到的Block那一边。0-无，1-左侧，2-上侧，3-右侧，4-下侧
-
-    public bool isWallMove = false;
-    public bool isRightChange = false;
-    public bool isLeftChange = false;
+    [HideInInspector] public int P_lastHitSide; // 玩家在Block的上一条边
+     public bool isWallMove = false; // 是否在Block上移动
+    [HideInInspector] public bool isRightChange = false; // 玩家是否顺时针换边
+    [HideInInspector] public bool isLeftChange = false; // 玩家是否逆时针换边
+    [HideInInspector] public bool hasChanged = false; // 玩家是否在不停止的移动中换过边，如果断过移动状态则为false
+    public bool isLeaving = false;
 
     #endregion
 
     #region 转身相关参数
 
     [Header("转身相关参数")]
-    [ReadOnly] public int faceDir;
-    [ReadOnly] public bool canFlip;
+    [HideInInspector] public int faceDir;
+    [HideInInspector] public bool canFlip;
     public bool isFacingRight { get; private set; } // 表示玩家当前是否面向右侧
 
     #endregion
@@ -48,8 +51,10 @@ public class Player : MonoBehaviour
     #region 跳跃相关参数
 
     [Header("跳跃相关参数")]
-    [ReadOnly] public bool isJumping;
-    [ReadOnly] public bool isJumpCut;
+    public bool canJump;
+    public bool isJumping;
+    public bool isJumpCut;
+    public bool isWallJumping;
     public ParticleSystem jumpParticle;
 
     #endregion
@@ -74,6 +79,10 @@ public class Player : MonoBehaviour
     public Player_FallState fallState { get; private set; }
     // 玩家在墙壁移动上的状态
     public Player_WallMoveState wallMoveState { get; private set; }
+    // 玩家在墙壁上跳跃/离开的状态
+    public Player_WallJumpState wallJumpState { get; private set; }
+    // 玩家在墙壁上离开的状态
+    public Player_WallLeaveState wallLeaveState { get; private set; }
     // 玩家转移Block的边的状态
     public Player_ChangeSideState changeSideState { get; private set; }
 
@@ -84,8 +93,11 @@ public class Player : MonoBehaviour
     private Dictionary<TimerType, float> timers = new Dictionary<TimerType, float>()
     {
         { TimerType.LastPressJump, 0 },
+        { TimerType.LastPressLeave, 0 },
+        { TimerType.LastPressWallJump, 0 },
         { TimerType.JumpInterval, 0 },
         { TimerType.LastOnGround, 0 },
+        { TimerType.LeaveBlockCoolDown, 0 },
     };
 
     private List<TimerType> keys;
@@ -101,6 +113,8 @@ public class Player : MonoBehaviour
         jumpState = new Player_JumpState(this, stateMachine, "Jump");
         fallState = new Player_FallState(this, stateMachine, "fall");
         wallMoveState = new Player_WallMoveState(this, stateMachine, "wallMove");
+        wallJumpState = new Player_WallJumpState(this, stateMachine, "wallJump");
+        wallLeaveState = new Player_WallLeaveState(this, stateMachine, "wallLeave");
         changeSideState = new Player_ChangeSideState(this, stateMachine, "changeSide");
     }
 
@@ -121,6 +135,8 @@ public class Player : MonoBehaviour
         SetPlayerGravityScale(movementData.gravityScale);
         isFacingRight = true;
         canFlip = true;
+        
+        canJump = true;
     }
 
     private void Update()
@@ -128,16 +144,20 @@ public class Player : MonoBehaviour
         // 更新当前状态
         stateMachine.currentState.Update();
         // 更新地面检测时间
-        isGround = check.IsOnGround();
+        isGround = check.IsOnGround(); 
+        
         UpdateTimers();
-
         FlipCheck();
         HandleJumpInput();
+        HandleWallJumpInput();
         HandlePlayerRotation();
         HandleBlockSideChange();
+        HandlePlayerLeaving();
 
         // 调试日志，输出当前状态
         Debug.Log(stateMachine.currentState);
+        // Debug.Log(isFacingRight);
+        //Debug.Log(GetTimer(TimerType.LeaveBlockCoolDown));
     }
 
     private void FixedUpdate()
@@ -145,16 +165,6 @@ public class Player : MonoBehaviour
         // 固定时间更新当前状态
         stateMachine.currentState.FixedUpdate();
     }
-
-    // 检测Player是否碰撞到Block
-    // private void OnCollisionEnter2D(Collision2D blockColl)
-    // {
-    //     if ((1 << blockColl.gameObject.layer & blockLayerMask) != 0 && hitBlock == false) 
-    //     {
-    //         hitBlock = true;
-    //         block = blockColl.gameObject.GetComponent<Block>();
-    //     }
-    // }
 
     #region 常用方法
 
@@ -214,6 +224,7 @@ public class Player : MonoBehaviour
         if (((faceDir > 0 && !isFacingRight) || (faceDir < 0 && isFacingRight)) && canFlip)
         {
             HFlip();
+            hasChanged = false;
         }
     }
     
@@ -229,7 +240,7 @@ public class Player : MonoBehaviour
 
     private void Run(float lerpAmount, float runMaxSpeed)
     {
-        // 获取当前移动方向（考虑旋转）
+        // 获取当前移动方向
         Vector2 moveDirection = GetCurrentMoveDirection();
 
         // 计算目标速度
@@ -272,11 +283,30 @@ public class Player : MonoBehaviour
         // 将旋转角度标准化到0-360度
         float normalizedRotation = (currentRotation % 360 + 360) % 360;
 
+        // 判断玩家经过Block下方时特殊情况的处理
+        if (hasChanged)
+        {
+            if (hitSide == 4)
+            {
+                if (isFacingRight)
+                    faceDir = -1;
+                else
+                    faceDir = 1;
+            }
+            else if (hitSide == 1 && !isFacingRight && P_lastHitSide == 4)
+            {
+                faceDir = 1;
+            }
+            else if (hitSide == 3 && isFacingRight && P_lastHitSide == 4) 
+            {
+                faceDir = -1;
+            }
+        }
+        
         // 根据旋转角度返回对应的移动方向
         if (normalizedRotation >= 315 || normalizedRotation < 45)
         {
-            // 0度方向 - 向右移动
-            return Vector2.right;
+            return Vector2.right; // 0度方向 - 向右移动
         }
         else if (normalizedRotation >= 45 && normalizedRotation < 135)
         {
@@ -294,7 +324,7 @@ public class Player : MonoBehaviour
             return Vector2.down;
         }
     }
-
+    
     /// <summary>
     /// 获取当前速度在指定方向上的分量
     /// </summary>
@@ -332,7 +362,9 @@ public class Player : MonoBehaviour
                Mathf.Abs(targetSpeed) > 0.01f &&
                GetTimer(TimerType.LastOnGround) < 0;
     }
-
+    
+    
+    
     #endregion
 
     #region 跳跃方法
@@ -342,29 +374,53 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandleJumpInput()
     {
+        if (isHitBlock && (hitSide == 1 || hitSide == 3)) 
+        {
+            OpenOrCloseJumpInputWindow(false);
+        }
+        else
+        {
+            OpenOrCloseJumpInputWindow(true);
+        }
+        
         // 如果没有跳跃输入，则直接返回
         if (GetTimer(TimerType.LastPressJump) <= 0)
             return;
-
+        
         // 普通跳跃逻辑（在地面且未跳跃）
         if (CanJump())
         {
             isJumping = true;
             isJumpCut = false;
             SetTimer(TimerType.JumpInterval, 0.1f);
-            return;
         }
     }
-
+    
     /// <summary>
     /// 判断玩家此时是否可以跳跃
     /// </summary>
     /// <returns>如果玩家在地面，在土狼时间内，可以跳跃</returns>
     private bool CanJump()
     {
-        return GetTimer(TimerType.LastOnGround) > 0 && !isJumping;
+        return GetTimer(TimerType.LastOnGround) > 0 && !isJumping && canJump && (!isHitBlock || hitSide == 2);
     }
 
+    private void HandleWallJumpInput()
+    {
+        if (GetTimer(TimerType.LastPressWallJump) <= 0)
+            return;
+
+        if (canWallJump())
+        {
+            isWallJumping = true;
+        }
+    }
+
+    private bool canWallJump()
+    {
+        return canJump && isHitBlock && hitSide != 2;
+    }
+    
     #endregion
 
     #region 地块方法
@@ -408,7 +464,7 @@ public class Player : MonoBehaviour
 
     private void HandlePlayerRotation()
     {
-        if (hitBlock)
+        if (isHitBlock)
         {
             isWallMove = true;
         }
@@ -426,7 +482,7 @@ public class Player : MonoBehaviour
         blockCornerPos = new Vector2[4];
         blockCornerPos = block.GetCornerPos();
 
-        if (faceDir == 1) 
+        if (isFacingRight) 
         {
             switch (hitSide)
             {
@@ -456,7 +512,7 @@ public class Player : MonoBehaviour
                     break;
             }
         }
-        else if (faceDir == -1)
+        else
         {
             switch (hitSide)
             {
@@ -488,12 +544,40 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void HandlePlayerLeaving()
+    {
+        if (GetTimer(TimerType.LastPressLeave) <= 0)
+            return;
+        
+        if (CanLeave())
+        {
+            isLeaving = true;
+        }
+    }
+
+    private bool CanLeave()
+    {
+        return isHitBlock && !canJump && hitSide != 2;
+    }
+    
+    public void ResetPlayerBlock()
+    {
+        isHitBlock = false;
+        hitSide = 0;
+        hasChanged = false;
+        block = null;
+        blockCornerPos = null;
+    }
+
     #endregion
 }
 
 public enum TimerType
 {
     LastPressJump,
+    LastPressLeave,
+    LastPressWallJump,
     JumpInterval,
     LastOnGround,
+    LeaveBlockCoolDown,
 }
