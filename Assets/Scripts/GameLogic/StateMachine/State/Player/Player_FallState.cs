@@ -14,6 +14,9 @@ public class Player_FallState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        
+        player.transform.rotation = Quaternion.Euler(0, 0, 0);
+        player.transform.localScale = new Vector3(player.transform.localScale.x, 1, player.transform.localScale.z);
     }
     
     public override void Update()
@@ -37,6 +40,9 @@ public class Player_FallState : PlayerState
         
         if (player.isJumping)
             stateMachine.ChangeState(player.jumpState);
+
+        if (player.isWallMove) 
+            stateMachine.ChangeState(player.wallMoveState);
     }
     
     public override void FixedUpdate()

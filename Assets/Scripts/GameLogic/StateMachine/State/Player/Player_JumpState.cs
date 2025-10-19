@@ -12,6 +12,9 @@ public class Player_JumpState : PlayerState
     {
         base.Enter();
 
+        player.transform.rotation = Quaternion.Euler(0, 0, 0);
+        player.transform.localScale = new Vector3(player.transform.localScale.x, 1, player.transform.localScale.z);
+        
         player.rb.velocity = new Vector2(player.rb.velocity.x, 0);
         player.SetPlayerGravityScale(movementData.gravityScale);
 
@@ -40,6 +43,9 @@ public class Player_JumpState : PlayerState
             player.SetPlayerGravityScale(movementData.gravityScale);
         }
 
+        if (player.isWallMove) 
+            player.stateMachine.ChangeState(player.wallMoveState);
+        
         if (player.rb.velocity.y < 0)
         {
             player.stateMachine.ChangeState(player.fallState);
