@@ -1,12 +1,31 @@
-# Ä¬ÈÏºöÂÔµÄÎÄ¼ş
+<<<<<<< Updated upstream
+# Ä¬ï¿½Ïºï¿½ï¿½Ôµï¿½ï¿½Ä¼ï¿½
 /shelf/
 /workspace.xml
-# Rider ºöÂÔµÄÎÄ¼ş
+# Rider ï¿½ï¿½ï¿½Ôµï¿½ï¿½Ä¼ï¿½
 /contentModel.xml
 /.idea.JuGuangDeng_gamejam.iml
 /projectSettingsUpdater.xml
 /modules.xml
-# »ùÓÚ±à¼­Æ÷µÄ HTTP ¿Í»§¶ËÇëÇó
+# ï¿½ï¿½ï¿½Ú±à¼­ï¿½ï¿½ï¿½ï¿½ HTTP ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï»¿# é»˜è®¤å¿½ç•¥çš„æ–‡ä»¶
+=======
+# é»˜è®¤å¿½ç•¥çš„æ–‡ä»¶
+>>>>>>> Stashed changes
+/shelf/
+/workspace.xml
+# Rider å¿½ç•¥çš„æ–‡ä»¶
+/.idea.JuGuangDeng_gamejam.iml
+<<<<<<< Updated upstream
+/modules.xml
+/projectSettingsUpdater.xml
+/contentModel.xml
+=======
+/contentModel.xml
+/modules.xml
+/projectSettingsUpdater.xml
+>>>>>>> Stashed changes
+# åŸºäºç¼–è¾‘å™¨çš„ HTTP å®¢æˆ·ç«¯è¯·æ±‚
 /httpRequests/
 # Datasource local storage ignored files
 /dataSources/

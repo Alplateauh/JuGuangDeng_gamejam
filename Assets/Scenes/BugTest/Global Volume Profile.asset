@@ -1,0 +1,174 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8029146885320011376
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 899c54efeace73346a0a16faa3afe726, type: 3}
+  m_Name: Vignette
+  m_EditorClassIdentifier: 
+  active: 0
+  color:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  center:
+    m_OverrideState: 1
+    m_Value: {x: 0.5, y: 0.6}
+  intensity:
+    m_OverrideState: 1
+    m_Value: 1
+  smoothness:
+    m_OverrideState: 1
+    m_Value: 1
+  rounded:
+    m_OverrideState: 1
+    m_Value: 1
+--- !u!114 &-6352073537154656443
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cefcabd7b397f1a4888d95dc90f973e9, type: 3}
+  m_Name: TwistGlitchVolume
+  m_EditorClassIdentifier: 
+  active: 0
+  intensity:
+    m_OverrideState: 1
+    m_Value: 1
+  centerPosition:
+    m_OverrideState: 1
+    m_Value: {x: 0.5, y: 0.61}
+  rotationAngle:
+    m_OverrideState: 0
+    m_Value: 0
+  effectShape:
+    m_OverrideState: 0
+    m_Value: 0
+  distortionStrength:
+    m_OverrideState: 1
+    m_Value: 0.332
+  distortionFrequency:
+    m_OverrideState: 0
+    m_Value: 0.1
+  distortionSpeed:
+    m_OverrideState: 0
+    m_Value: 0
+  vignetteSoftness:
+    m_OverrideState: 1
+    m_Value: 0
+  vignetteRadius:
+    m_OverrideState: 1
+    m_Value: 0.05
+  aspectRatio:
+    m_OverrideState: 0
+    m_Value: 1
+  noiseTexture:
+    m_OverrideState: 0
+    m_Value: {fileID: 0}
+    dimension: 1
+  noiseScale:
+    m_OverrideState: 0
+    m_Value: 0.05
+--- !u!114 &-5492008029374310682
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3b12956296a18142a8951116b415af3, type: 3}
+  m_Name: DigitalGlitchVolume
+  m_EditorClassIdentifier: 
+  active: 0
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.5
+  noiseTexture:
+    m_OverrideState: 0
+    m_Value: {fileID: 0}
+    dimension: 1
+  updateFrequency:
+    m_OverrideState: 1
+    m_Value: 0.1
+--- !u!114 &-4518031384366860772
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56c6775b61a563741929afb27a196dcf, type: 3}
+  m_Name: SnowGlitchVolume
+  m_EditorClassIdentifier: 
+  active: 0
+  snowIntensity:
+    m_OverrideState: 1
+    m_Value: 0.672
+  snowSize:
+    m_OverrideState: 1
+    m_Value: 0.081
+  snowDensity:
+    m_OverrideState: 1
+    m_Value: 0.437
+  flickerSpeed:
+    m_OverrideState: 0
+    m_Value: 0
+  staticIntensity:
+    m_OverrideState: 1
+    m_Value: 0.604
+--- !u!114 &-4151047875002942618
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fe18c4ebab59f24e907c05e09c668dd, type: 3}
+  m_Name: AnalogGlitchVolume
+  m_EditorClassIdentifier: 
+  active: 0
+  scanLineJitter:
+    m_OverrideState: 1
+    m_Value: 1
+  verticalJump:
+    m_OverrideState: 0
+    m_Value: 0
+  horizontalShake:
+    m_OverrideState: 0
+    m_Value: 0
+  colorDrift:
+    m_OverrideState: 1
+    m_Value: 0.271
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: Global Volume Profile
+  m_EditorClassIdentifier: 
+  components:
+  - {fileID: -8029146885320011376}
+  - {fileID: -4151047875002942618}
+  - {fileID: -5492008029374310682}
+  - {fileID: -4518031384366860772}
+  - {fileID: -6352073537154656443}
