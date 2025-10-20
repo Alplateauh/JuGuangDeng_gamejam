@@ -6,6 +6,11 @@ public class LibraryHookingPlugin : BasePlugin
 {
     public override void Effect()
     {
-        Debug.Log("X0RegisterPlugin Effect");
+        Debug.Log("LibraryHookingPlugin Effect");
+    }
+
+    public override void RemoveEffect()
+    {
+        Debug.Log("LibraryHookingPlugin RemoveEffect");
     }
 }

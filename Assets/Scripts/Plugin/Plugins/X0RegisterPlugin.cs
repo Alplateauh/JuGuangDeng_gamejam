@@ -8,4 +8,9 @@ public class X0RegisterPlugin : BasePlugin
     {
         Debug.Log("X0RegisterPlugin Effect");
     }
+
+    public override void RemoveEffect()
+    {
+        Debug.Log("X0RegisterPlugin RemoveEffect");
+    }
 }

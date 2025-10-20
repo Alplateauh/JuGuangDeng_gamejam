@@ -5,5 +5,6 @@
     <file url="file://$PROJECT_DIR$/Assets/Scripts/GameLogic/Data/PlayerMovementData.cs" charset="GB2312" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/GameLogic/Entity/Player.cs" charset="GB2312" />
     <file url="file://$PROJECT_DIR$/Assets/Scripts/GameLogic/StateMachine/FSM/PlayerFSM.cs" charset="GB2312" />
+    <file url="file://$PROJECT_DIR$/Assets/Scripts/GameLogic/StateMachine/State/Player/Input/Player_InputHandle.cs" charset="UTF-8" />
   </component>
 </project>
