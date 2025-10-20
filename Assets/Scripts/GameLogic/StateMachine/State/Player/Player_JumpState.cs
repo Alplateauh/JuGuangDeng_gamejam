@@ -18,10 +18,8 @@ public class Player_JumpState : PlayerState
         player.rb.velocity = new Vector2(player.rb.velocity.x, 0);
         player.SetPlayerGravityScale(movementData.gravityScale);
 
-        float force = movementData.jumpForce;
-        if (TimeMgr.GetInstance().IsStop())
-            player.rb.AddForce(force * Vector2.up / Time.timeScale, ForceMode2D.Impulse);
-        else player.rb.AddForce(force * Vector2.up, ForceMode2D.Impulse);
+        float force = movementData.jumpForce; 
+        player.rb.AddForce(force * Vector2.up, ForceMode2D.Impulse);
     }
 
 

@@ -21,7 +21,10 @@ MonoBehaviour:
   deccelInAir: 0.65
   speedThreshold: 0.1
   adsorbeOutTime: 0.25
+  leaveBlockCooldown: 0.1
+  leaveInputBufferTime: 0.05
   jumpHeight: 2.5
+  wallJumpForce: 20
   jumpTimeToApex: 0.3
   jumpCount: 1
   coyoteTime: 0.1
