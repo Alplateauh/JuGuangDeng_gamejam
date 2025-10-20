@@ -9,24 +9,24 @@ public class Check : MonoBehaviour
     private Player player;
     private PlayerMovementData data;
     
-    [Header("µØÃæ¼ì²â")]
+    // åœ¨æ£€æŸ¥åŒºè®¾ç½®è¿™äº›
+    [Header("åœ°é¢æ£€æµ‹")]
     [SerializeField] private Transform _groundCheckPoint;
-    [SerializeField] private Vector2 _groundCheckSize;
-    
+    // åœ°é¢æ£€æŸ¥çš„å¤§å°é€šå¸¸æ¯”è§’è‰²å®½åº¦ï¼ˆç”¨äºåœ°é¢ï¼‰å’Œé«˜åº¦ï¼ˆç”¨äºå¢™å£æ£€æŸ¥ï¼‰ç¨å°
+    [SerializeField] private Vector2 _groundCheckSize = new Vector2(0.49f, 0.03f);
     [Space(5)]
-    [Header("µØ¿é¼ì²â")]
+    [Header("ï¿½Ø¿ï¿½ï¿½ï¿½")]
     [SerializeField] private Transform _frontBlockCheckPoint;
     [SerializeField] private Vector2 _frontBlockCheckSize;
     [SerializeField] private Transform _headBlockCheckPoint;
     [SerializeField] private Vector2 _headBlockCheckSize;
     
-    [Space(5)]
-    [Header("µØÃæÍ¼²ã")]
+    [Header("å±‚å’Œæ ‡ç­¾")]
     [SerializeField] private LayerMask _groundLayer;
-    [Header("µØ¿éÍ¼²ã")]
+    [Header("ï¿½Ø¿ï¿½Í¼ï¿½ï¿½")]
     [SerializeField] private LayerMask _blockLayer;
 
-    // ´æ´¢µ±Ç°Ğı×ª½Ç¶È
+    // ï¿½æ´¢ï¿½ï¿½Ç°ï¿½ï¿½×ªï¿½Ç¶ï¿½
     private float currentRotation;
 
     private void Start()
@@ -34,21 +34,21 @@ public class Check : MonoBehaviour
         player = GetComponent<Player>();
         data = player.movementData;
         
-        // ³õÊ¼»¯Ğı×ª½Ç¶È
+        // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶ï¿½
         currentRotation = transform.eulerAngles.z;
     }
 
     private void Update()
     {
-        // ¸üĞÂµ±Ç°Ğı×ª½Ç¶È
+        // ï¿½ï¿½ï¿½Âµï¿½Ç°ï¿½ï¿½×ªï¿½Ç¶ï¿½
         currentRotation = transform.eulerAngles.z;
         
         if (!player.isJumping && data != null && player != null) 
         {
-            // µØÃæ¼ì²é
-            if (IsOnGround() && !player.isJumping)
+            // åœ°é¢æ£€æŸ¥
+            if (IsOnGround() && !player.isJumping) // æ£€æŸ¥è®¾ç½®çš„æ¡†æ˜¯å¦ä¸åœ°é¢é‡å 
             {
-                player.SetTimer(TimerType.LastOnGround, data.coyoteTime);
+                player.SetTimer(TimerType.LastOnGround, data.coyoteTime); // å¦‚æœé‡å ï¼Œè®¾ç½®æœ€åçš„åœ°é¢æ—¶é—´ä¸º coyoteTime
             }
         }
 
@@ -61,18 +61,18 @@ public class Check : MonoBehaviour
         {
             if (FrontBlockCheck())
             {
-                // Íæ¼Ò½Ó´¥Block×ó²à
+                // ï¿½ï¿½Ò½Ó´ï¿½Blockï¿½ï¿½ï¿½
                 if (player.isFacingRight)
                 {
                     player.hitSide = 1;
                 }
-                // Íæ¼Ò½Ó´¥BlockÓÒ²à
+                // ï¿½ï¿½Ò½Ó´ï¿½Blockï¿½Ò²ï¿½
                 else
                 {
                     player.hitSide = 3;
                 }   
             }
-            // Íæ¼ÒÍ·¶¥µ½BlockÏÂ²à
+            // ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½Blockï¿½Â²ï¿½
             else if(HeadBlockCheck())
             {
                 player.hitSide = 4;
@@ -90,7 +90,7 @@ public class Check : MonoBehaviour
     
     public bool IsOnGround()
     {
-        // Ê¹ÓÃĞı×ª½Ç¶È½øĞĞ¼ì²â
+        // Ê¹ï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶È½ï¿½ï¿½Ğ¼ï¿½ï¿½
         Collider2D collider = Physics2D.OverlapBox(
             _groundCheckPoint.position, 
             _groundCheckSize, 
@@ -103,7 +103,7 @@ public class Check : MonoBehaviour
 
     private bool FrontBlockCheck()
     {
-        // Ê¹ÓÃĞı×ª½Ç¶È½øĞĞ¼ì²â
+        // Ê¹ï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶È½ï¿½ï¿½Ğ¼ï¿½ï¿½
         Collider2D collider = Physics2D.OverlapBox(
             _frontBlockCheckPoint.position, 
             _frontBlockCheckSize, 
@@ -116,7 +116,7 @@ public class Check : MonoBehaviour
 
     private bool HeadBlockCheck()
     {
-        // Ê¹ÓÃĞı×ª½Ç¶È½øĞĞ¼ì²â
+        // Ê¹ï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶È½ï¿½ï¿½Ğ¼ï¿½ï¿½
         Collider2D collider = Physics2D.OverlapBox(
             _headBlockCheckPoint.position, 
             _headBlockCheckSize, 
@@ -129,7 +129,7 @@ public class Check : MonoBehaviour
     
     public bool BottomBlockCheck()
     {
-        // Ê¹ÓÃĞı×ª½Ç¶È½øĞĞ¼ì²â
+        // Ê¹ï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶È½ï¿½ï¿½Ğ¼ï¿½ï¿½
         Collider2D collider = Physics2D.OverlapBox(
             _groundCheckPoint.position, 
             _headBlockCheckSize, 
@@ -142,10 +142,10 @@ public class Check : MonoBehaviour
     
     private void OnDrawGizmosSelected()
     {
-        // ±£´æµ±Ç°¾ØÕó
+        // ï¿½ï¿½ï¿½æµ±Ç°ï¿½ï¿½ï¿½ï¿½
         Matrix4x4 originalMatrix = Gizmos.matrix;
         
-        // »æÖÆµØÃæ¼ì²âÇøÓò£¨´øĞı×ª£©
+        // ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ò£¨´ï¿½ï¿½ï¿½×ªï¿½ï¿½
         Gizmos.color = Color.green;
         Gizmos.matrix = Matrix4x4.TRS(
             _groundCheckPoint.position, 
@@ -154,7 +154,7 @@ public class Check : MonoBehaviour
         );
         Gizmos.DrawWireCube(Vector3.zero, _groundCheckSize);
         
-        // »æÖÆÇ°·½Block¼ì²âÇøÓò£¨´øĞı×ª£©
+        // ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½Blockï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ò£¨´ï¿½ï¿½ï¿½×ªï¿½ï¿½
         Gizmos.color = Color.red;
         Gizmos.matrix = Matrix4x4.TRS(
             _frontBlockCheckPoint.position, 
@@ -163,7 +163,7 @@ public class Check : MonoBehaviour
         );
         Gizmos.DrawWireCube(Vector3.zero, _frontBlockCheckSize);
         
-        // »æÖÆÉÏ·½Block¼ì²âÇøÓò£¨´øĞı×ª£©
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½Blockï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ò£¨´ï¿½ï¿½ï¿½×ªï¿½ï¿½
         Gizmos.color = Color.red;
         Gizmos.matrix = Matrix4x4.TRS(
             _headBlockCheckPoint.position, 
@@ -172,7 +172,7 @@ public class Check : MonoBehaviour
         );
         Gizmos.DrawWireCube(Vector3.zero, _headBlockCheckSize);
         
-        // »Ö¸´Ô­Ê¼¾ØÕó
+        // ï¿½Ö¸ï¿½Ô­Ê¼ï¿½ï¿½ï¿½ï¿½
         Gizmos.matrix = originalMatrix;
     }
 }
