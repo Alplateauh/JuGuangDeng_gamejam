@@ -10,4 +10,5 @@ public class PluginData : ScriptableObject
     public int number;
     public string description;
     public InteractionType interactionType;
+    public Sprite icon;
 }
