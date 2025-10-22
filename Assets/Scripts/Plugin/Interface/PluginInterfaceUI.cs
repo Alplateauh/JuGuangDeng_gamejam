@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,16 +12,47 @@ public class PluginInterfaceUI : MonoBehaviour
     private List<Button> exchangeButton = new List<Button>();
     
     public Dictionary<Button,BasePlugin> buttonOwnedPlugin = new Dictionary<Button, BasePlugin>();
-    
+
+    void Start()
+    {
+        foreach (Button button in activeButton)
+        {
+            button.onClick.AddListener(() => { ExchangePlugin(button);});
+        }
+
+        foreach (Button button in inactiveButton)
+        {
+            button.onClick.AddListener(() => { ExchangePlugin(button);});
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (pluginManager)
+        {
+            pluginManager.gameObject.GetComponent<Player>().OpenOrCloseJumpInputWindow(false);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (pluginManager)
+        {
+            pluginManager.gameObject.GetComponent<Player>().OpenOrCloseJumpInputWindow(true);
+        }
+    }
+
     public void SetManager(PluginManager pluginManager)
     {
         this.pluginManager = pluginManager;
+        ShowPlugin();
     }
 
     void ShowPlugin()
     {
         int active = 0;
         int inactive = 0;
+        Debug.Log(pluginManager.pickedPlugins.Count);
         foreach (BasePlugin plugin in pluginManager.pickedPlugins)
         {
             if (!pluginManager.activePlugins.Contains(plugin))

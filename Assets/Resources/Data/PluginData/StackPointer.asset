@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 938f83594f721b34893ab3c675ce98c4, type: 3}
   m_Name: StackPointer
   m_EditorClassIdentifier: 
-  pluginName: 
+  pluginName: StackPointer
   number: 0
   description: 
   interactionType: 1
+  icon: {fileID: 0}

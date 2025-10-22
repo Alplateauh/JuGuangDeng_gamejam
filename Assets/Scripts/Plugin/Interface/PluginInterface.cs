@@ -17,6 +17,7 @@ public class PluginInterface : MonoBehaviour
         PluginManager pluginManager = other.gameObject.GetComponent<PluginManager>();
         if (pluginManager != null)
         {
+            interfaceUI.GetComponent<PluginInterfaceUI>().SetManager(pluginManager);
             interfaceUI.SetActive(true);
         }
     }
