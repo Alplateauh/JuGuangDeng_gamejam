@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.Tilemaps;
-
 public class BugRealize : BugBase
 {
     float timer;
@@ -13,7 +11,7 @@ public class BugRealize : BugBase
     
     public BugType type;
 
-    [Min(0)]
+    [Min(1)]
     public float distance;
     public delegate void BugEventHandler(out bool flag);
 
@@ -258,44 +256,7 @@ public class BugRealize : BugBase
     }
     
     
-    List<Vector3Int> GetAllTiles()
-    {
-        List<Vector3Int> positions = new List<Vector3Int>();
-        
-        if (tilemap != null)
-        {
-            BoundsInt bounds = tilemap.cellBounds;
-            foreach (var position in bounds.allPositionsWithin)
-            {
-                if (tilemap.HasTile(position))
-                {
-                    positions.Add(position);
-                }
-            }
-            positions.Sort((a, b) => a.x.CompareTo(b.x));
-        }
-        
-        return positions;
-    }
-    
-    
-    void ChangeTileColor(Vector3Int position, float saturationDelta)
-    {
-        if (tilemap == null) return;
-        
-        Color currentColor = tilemap.GetColor(position);
 
-        Color.RGBToHSV(currentColor, out float h, out float s, out float v);
-
-        s = Mathf.Clamp01(s + saturationDelta / 100f); // 注意：除以100，因为你的滑块是0-100
-
-        Color newColor = Color.HSVToRGB(h, s, v);
-        newColor.a = currentColor.a;
-        
-        tilemap.RemoveTileFlags(position, TileFlags.LockColor);
-        tilemap.SetColor(position, newColor);
-        
-    }
     
 
 }

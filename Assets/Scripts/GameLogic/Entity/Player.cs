@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
 {
-    #region ÒıÓÃ
+    #region å¼•ç”¨
 
     public Animator animator { get; private set; }
     public Rigidbody2D rb { get; private set; }
@@ -14,13 +15,13 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    [Header("Íæ¼ÒÊı¾İ")]
+    [Header("ç©å®¶æ•°æ®")]
     public PlayerMovementData movementData;
     [ReadOnly] public bool isGround = false;
 
-    #region µØ¿éÏà¹Ø
+    #region åœ°å—ç›¸å…³
 
-    [Header("µØ¿éÏà¹Ø²ÎÊı")]
+    [Header("åœ°å—ç›¸å…³å‚æ•°")]
     public float playerHeight;
     
     public Block block;
@@ -28,7 +29,7 @@ public class Player : MonoBehaviour
     public Transform rotatePos;
     public Transform changePos;
     public bool hitBlock = false;
-    public int hitSide; // ´ú±íÍæ¼ÒÅö×²µ½µÄBlockÄÇÒ»±ß¡£0-ÎŞ£¬1-×ó²à£¬2-ÉÏ²à£¬3-ÓÒ²à£¬4-ÏÂ²à
+    public int hitSide; // ä»£è¡¨ç©å®¶ç¢°æ’åˆ°çš„Blocké‚£ä¸€è¾¹ã€‚0-æ— ï¼Œ1-å·¦ä¾§ï¼Œ2-ä¸Šä¾§ï¼Œ3-å³ä¾§ï¼Œ4-ä¸‹ä¾§
 
     public bool isWallMove = false;
     public bool isRightChange = false;
@@ -36,56 +37,61 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region ×ªÉíÏà¹Ø²ÎÊı
+    #region è½¬èº«ç›¸å…³å‚æ•°
 
-    [Header("×ªÉíÏà¹Ø²ÎÊı")]
-    [ReadOnly] public int faceDir;
-    [ReadOnly] public bool canFlip;
-    public bool isFacingRight { get; private set; } // ±íÊ¾Íæ¼Òµ±Ç°ÊÇ·ñÃæÏòÓÒ²à
+    [Header("è½¬èº«ç›¸å…³å‚æ•°")]
+    [HideInInspector] public int faceDir;
+    [HideInInspector] public bool canFlip;
+    public bool isFacingRight { get; private set; } // è¡¨ç¤ºç©å®¶å½“å‰æ˜¯å¦é¢å‘å³ä¾§
 
     #endregion
 
-    #region ÌøÔ¾Ïà¹Ø²ÎÊı
+    #region è·³è·ƒç›¸å…³å‚æ•°
 
-    [Header("ÌøÔ¾Ïà¹Ø²ÎÊı")]
-    [ReadOnly] public bool isJumping;
-    [ReadOnly] public bool isJumpCut;
+    [Header("è·³è·ƒç›¸å…³å‚æ•°")]
+    public bool canJump;
+    public bool isJumping;
+    public bool isJumpCut;
+    public bool isWallJumping;
     public ParticleSystem jumpParticle;
 
     #endregion
 
-    #region ÊäÈë´°¿Ú
+    #region è¾“å…¥çª—å£
 
-    // µ±±äÁ¿Îªfalse£¬ÔÚInputHandleÖĞÆÁ±ÎÊäÈë
+    // å½“å˜é‡ä¸ºfalseï¼Œåœ¨InputHandleä¸­å±è”½è¾“å…¥
     public bool jumpInputWindow { get; private set; }
 
     #endregion
 
-    #region ×´Ì¬»ú
+    #region çŠ¶æ€æœº
 
     public PlayerFSM stateMachine { get; private set; }
-    // Íæ¼Ò¿ÕÏĞ×´Ì¬
+    // ç©å®¶ç©ºé—²çŠ¶æ€
     public Player_IdleState idleState { get; private set; }
-    // Íæ¼ÒÒÆ¶¯×´Ì¬
+    // ç©å®¶ç§»åŠ¨çŠ¶æ€
     public Player_MoveState moveState { get; private set; }
-    // Íæ¼ÒÌøÔ¾×´Ì¬
+    // ç©å®¶è·³è·ƒçŠ¶æ€
     public Player_JumpState jumpState { get; private set; }
-    // Íæ¼ÒÏÂÂä×´Ì¬
+    // ç©å®¶ä¸‹è½çŠ¶æ€
     public Player_FallState fallState { get; private set; }
-    // Íæ¼ÒÔÚÇ½±ÚÒÆ¶¯ÉÏµÄ×´Ì¬
+    // ç©å®¶åœ¨å¢™å£ç§»åŠ¨ä¸Šçš„çŠ¶æ€
     public Player_WallMoveState wallMoveState { get; private set; }
-    // Íæ¼Ò×ªÒÆBlockµÄ±ßµÄ×´Ì¬
+    // ç©å®¶è½¬ç§»Blockçš„è¾¹çš„çŠ¶æ€
     public Player_ChangeSideState changeSideState { get; private set; }
 
     #endregion
 
-    #region ¼ÆÊ±Æ÷
+    #region è®¡æ—¶å™¨
 
     private Dictionary<TimerType, float> timers = new Dictionary<TimerType, float>()
     {
         { TimerType.LastPressJump, 0 },
+        { TimerType.LastPressLeave, 0 },
+        { TimerType.LastPressWallJump, 0 },
         { TimerType.JumpInterval, 0 },
         { TimerType.LastOnGround, 0 },
+        { TimerType.LeaveBlockCoolDown, 0 },
     };
 
     private List<TimerType> keys;
@@ -94,7 +100,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        // ³õÊ¼»¯×´Ì¬»ú×´Ì¬
+        // åˆå§‹åŒ–çŠ¶æ€æœºçŠ¶æ€
         stateMachine = new PlayerFSM();
         idleState = new Player_IdleState(this, stateMachine, "Idle");
         moveState = new Player_MoveState(this, stateMachine, "Move");
@@ -106,47 +112,51 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        // ÉèÖÃÒıÓÃ
+        // è®¾ç½®å¼•ç”¨
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
         check = GetComponent<Check>();
 
-        // ³õÊ¼»¯×´Ì¬»ú
+        // åˆå§‹åŒ–çŠ¶æ€æœº
         stateMachine.Init(idleState);
         keys = new List<TimerType>(timers.Keys);
         jumpInputWindow = true;
         faceDir = 0;
 
-        // ÉèÖÃ³õÊ¼ÖØÁ¦Óë³¯Ïò
+        // è®¾ç½®åˆå§‹é‡åŠ›ä¸æœå‘
         SetPlayerGravityScale(movementData.gravityScale);
         isFacingRight = true;
         canFlip = true;
+        
+        canJump = true;
     }
 
     private void Update()
     {
-        // ¸üĞÂµ±Ç°×´Ì¬
+        // æ›´æ–°å½“å‰çŠ¶æ€
         stateMachine.currentState.Update();
-        // ¸üĞÂµØÃæ¼ì²âÊ±¼ä
-        isGround = check.IsOnGround();
+        // æ›´æ–°åœ°é¢æ£€æµ‹æ—¶é—´
+        isGround = check.IsOnGround(); 
+        
         UpdateTimers();
-
         FlipCheck();
         HandleJumpInput();
         HandlePlayerRotation();
         HandleBlockSideChange();
 
-        // µ÷ÊÔÈÕÖ¾£¬Êä³öµ±Ç°×´Ì¬
+        // è°ƒè¯•æ—¥å¿—ï¼Œè¾“å‡ºå½“å‰çŠ¶æ€
         Debug.Log(stateMachine.currentState);
+        // Debug.Log(isFacingRight);
+        //Debug.Log(GetTimer(TimerType.LeaveBlockCoolDown));
     }
 
     private void FixedUpdate()
     {
-        // ¹Ì¶¨Ê±¼ä¸üĞÂµ±Ç°×´Ì¬
+        // å›ºå®šæ—¶é—´æ›´æ–°å½“å‰çŠ¶æ€
         stateMachine.currentState.FixedUpdate();
     }
 
-    // ¼ì²âPlayerÊÇ·ñÅö×²µ½Block
+    // æ£€æµ‹Playeræ˜¯å¦ç¢°æ’åˆ°Block
     // private void OnCollisionEnter2D(Collision2D blockColl)
     // {
     //     if ((1 << blockColl.gameObject.layer & blockLayerMask) != 0 && hitBlock == false) 
@@ -156,12 +166,12 @@ public class Player : MonoBehaviour
     //     }
     // }
 
-    #region ³£ÓÃ·½·¨
+    #region å¸¸ç”¨æ–¹æ³•
 
     /// <summary>
-    /// ÉèÖÃÍæ¼ÒµÄÖØÁ¦
+    /// è®¾ç½®ç©å®¶çš„é‡åŠ›
     /// </summary>
-    /// <param name="gravityScale">ÖØÁ¦</param>
+    /// <param name="gravityScale">é‡åŠ›</param>
     public void SetPlayerGravityScale(float gravityScale)
     {
         if (TimeMgr.GetInstance().IsStop()) rb.gravityScale = gravityScale / Time.timeScale / Time.timeScale;
@@ -169,7 +179,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// ´ò¿ª»òÕß¹Ø±ÕÌøÔ¾ÊäÈë´°¿Ú
+    /// æ‰“å¼€æˆ–è€…å…³é—­è·³è·ƒè¾“å…¥çª—å£
     /// </summary>
     /// <param name="isOpen"></param>
     public void OpenOrCloseJumpInputWindow(bool isOpen)
@@ -178,7 +188,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// Í³Ò»µÄ¼ÆÊ±Æ÷¸üĞÂ·½·¨
+    /// ç»Ÿä¸€çš„è®¡æ—¶å™¨æ›´æ–°æ–¹æ³•
     /// </summary>
     private void UpdateTimers()
     {
@@ -198,7 +208,7 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region ¼ì²â·½·¨
+    #region æ£€æµ‹æ–¹æ³•
 
     private void HFlip()
     {
@@ -214,32 +224,33 @@ public class Player : MonoBehaviour
         if (((faceDir > 0 && !isFacingRight) || (faceDir < 0 && isFacingRight)) && canFlip)
         {
             HFlip();
+            hasChanged = false;
         }
     }
     
     #endregion
 
-    #region ÒÆ¶¯·½·¨
+    #region ç§»åŠ¨æ–¹æ³•
 
     public void Run(float lerpAmount)
     {
-        // Ê¹ÓÃÄ¬ÈÏµÄ×î´óËÙ¶È
+        // ä½¿ç”¨é»˜è®¤çš„æœ€å¤§é€Ÿåº¦
         Run(lerpAmount, movementData.runMaxSpeed);
     }
 
     private void Run(float lerpAmount, float runMaxSpeed)
     {
-        // »ñÈ¡µ±Ç°ÒÆ¶¯·½Ïò£¨¿¼ÂÇĞı×ª£©
+        // è·å–å½“å‰ç§»åŠ¨æ–¹å‘ï¼ˆè€ƒè™‘æ—‹è½¬ï¼‰
         Vector2 moveDirection = GetCurrentMoveDirection();
 
-        // ¼ÆËãÄ¿±êËÙ¶È
+        // è®¡ç®—ç›®æ ‡é€Ÿåº¦
         float targetSpeed = faceDir * runMaxSpeed;
         targetSpeed = Mathf.Lerp(GetVelocityInMoveDirection(moveDirection), targetSpeed, lerpAmount);
 
-        // ¸ù¾İÄ¿±êËÙ¶È¼ÆËã¼ÓËÙÂÊ
+        // æ ¹æ®ç›®æ ‡é€Ÿåº¦è®¡ç®—åŠ é€Ÿç‡
         float accelRate = CalculateAccelRate(targetSpeed);
 
-        // ÌøÔ¾¶¥µãÊ±µÄÌØÊâ´¦Àí
+        // è·³è·ƒé¡¶ç‚¹æ—¶çš„ç‰¹æ®Šå¤„ç†
         if ((isJumping || stateMachine.currentState == fallState) &&
             Mathf.Abs(rb.velocity.y) < movementData.jumpHangTimeThreshold)
         {
@@ -247,56 +258,56 @@ public class Player : MonoBehaviour
             targetSpeed *= movementData.jumpHangMaxSpeedMult;
         }
 
-        // Èç¹û·ûºÏ±£³Ö¶¯Á¿µÄÌõ¼ş£¬Ôò²»½øĞĞ¼ÓËÙ
+        // å¦‚æœç¬¦åˆä¿æŒåŠ¨é‡çš„æ¡ä»¶ï¼Œåˆ™ä¸è¿›è¡ŒåŠ é€Ÿ
         if (ShouldMaintainMomentum(targetSpeed, moveDirection))
         {
             accelRate = 0;
         }
 
-        // ¼ÆËãµ±Ç°ËÙ¶ÈÔÚÒÆ¶¯·½ÏòÉÏµÄ·ÖÁ¿
+        // è®¡ç®—å½“å‰é€Ÿåº¦åœ¨ç§»åŠ¨æ–¹å‘ä¸Šçš„åˆ†é‡
         float currentVelInMoveDir = GetVelocityInMoveDirection(moveDirection);
         float movement = (targetSpeed - currentVelInMoveDir) * accelRate;
 
-        // ÑØÕıÈ·µÄ·½ÏòÊ©¼ÓÁ¦
+        // æ²¿æ­£ç¡®çš„æ–¹å‘æ–½åŠ åŠ›
         rb.AddForce(movement * moveDirection, ForceMode2D.Force);
     }
 
     /// <summary>
-    /// »ñÈ¡µ±Ç°ÒÆ¶¯·½Ïò£¨¿¼ÂÇ½ÇÉ«Ğı×ª£©
+    /// è·å–å½“å‰ç§»åŠ¨æ–¹å‘ï¼ˆè€ƒè™‘è§’è‰²æ—‹è½¬ï¼‰
     /// </summary>
     private Vector2 GetCurrentMoveDirection()
     {
-        // ¸ù¾İ½ÇÉ«Ğı×ª½Ç¶ÈÈ·¶¨ÒÆ¶¯·½Ïò
+        // æ ¹æ®è§’è‰²æ—‹è½¬è§’åº¦ç¡®å®šç§»åŠ¨æ–¹å‘
         float currentRotation = transform.eulerAngles.z;
 
-        // ½«Ğı×ª½Ç¶È±ê×¼»¯µ½0-360¶È
+        // å°†æ—‹è½¬è§’åº¦æ ‡å‡†åŒ–åˆ°0-360åº¦
         float normalizedRotation = (currentRotation % 360 + 360) % 360;
 
-        // ¸ù¾İĞı×ª½Ç¶È·µ»Ø¶ÔÓ¦µÄÒÆ¶¯·½Ïò
+        // æ ¹æ®æ—‹è½¬è§’åº¦è¿”å›å¯¹åº”çš„ç§»åŠ¨æ–¹å‘
         if (normalizedRotation >= 315 || normalizedRotation < 45)
         {
-            // 0¶È·½Ïò - ÏòÓÒÒÆ¶¯
+            // 0åº¦æ–¹å‘ - å‘å³ç§»åŠ¨
             return Vector2.right;
         }
         else if (normalizedRotation >= 45 && normalizedRotation < 135)
         {
-            // 90¶È·½Ïò - ÏòÉÏÒÆ¶¯
+            // 90åº¦æ–¹å‘ - å‘ä¸Šç§»åŠ¨
             return Vector2.up;
         }
         else if (normalizedRotation >= 135 && normalizedRotation < 225)
         {
-            // 180¶È·½Ïò - Ïò×óÒÆ¶¯
+            // 180åº¦æ–¹å‘ - å‘å·¦ç§»åŠ¨
             return Vector2.left;
         }
-        else // 225-315¶È
+        else // 225-315åº¦
         {
-            // 270¶È·½Ïò - ÏòÏÂÒÆ¶¯
+            // 270åº¦æ–¹å‘ - å‘ä¸‹ç§»åŠ¨
             return Vector2.down;
         }
     }
 
     /// <summary>
-    /// »ñÈ¡µ±Ç°ËÙ¶ÈÔÚÖ¸¶¨·½ÏòÉÏµÄ·ÖÁ¿
+    /// è·å–å½“å‰é€Ÿåº¦åœ¨æŒ‡å®šæ–¹å‘ä¸Šçš„åˆ†é‡
     /// </summary>
     private float GetVelocityInMoveDirection(Vector2 moveDirection)
     {
@@ -304,7 +315,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸ù¾İÄ¿±êËÙ¶ÈºÍÍæ¼Ò×´Ì¬¼ÆËã¼ÓËÙ¶È
+    /// æ ¹æ®ç›®æ ‡é€Ÿåº¦å’Œç©å®¶çŠ¶æ€è®¡ç®—åŠ é€Ÿåº¦
     /// </summary>
     private float CalculateAccelRate(float targetSpeed)
     {
@@ -321,7 +332,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// ÅĞ¶ÏÊÇ·ñÓ¦¸Ã±£³Ö¶¯Á¿
+    /// åˆ¤æ–­æ˜¯å¦åº”è¯¥ä¿æŒåŠ¨é‡
     /// </summary>
     private bool ShouldMaintainMomentum(float targetSpeed, Vector2 moveDirection)
     {
@@ -335,45 +346,69 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region ÌøÔ¾·½·¨
+    #region è·³è·ƒæ–¹æ³•
 
     /// <summary>
-    /// ´¦ÀíÍæ¼ÒÌøÔ¾
+    /// å¤„ç†ç©å®¶è·³è·ƒ
     /// </summary>
     private void HandleJumpInput()
     {
-        // Èç¹ûÃ»ÓĞÌøÔ¾ÊäÈë£¬ÔòÖ±½Ó·µ»Ø
+        if (isHitBlock && (hitSide == 1 || hitSide == 3)) 
+        {
+            OpenOrCloseJumpInputWindow(false);
+        }
+        else
+        {
+            OpenOrCloseJumpInputWindow(true);
+        }
+        
+        // å¦‚æœæ²¡æœ‰è·³è·ƒè¾“å…¥ï¼Œåˆ™ç›´æ¥è¿”å›
         if (GetTimer(TimerType.LastPressJump) <= 0)
             return;
-
-        // ÆÕÍ¨ÌøÔ¾Âß¼­£¨ÔÚµØÃæÇÒÎ´ÌøÔ¾£©
+        
+        // æ™®é€šè·³è·ƒé€»è¾‘ï¼ˆåœ¨åœ°é¢ä¸”æœªè·³è·ƒï¼‰
         if (CanJump())
         {
             isJumping = true;
             isJumpCut = false;
             SetTimer(TimerType.JumpInterval, 0.1f);
+        }
+    }
+    
+    /// <summary>
+    /// åˆ¤æ–­ç©å®¶æ­¤æ—¶æ˜¯å¦å¯ä»¥è·³è·ƒ
+    /// </summary>
+    /// <returns>å¦‚æœç©å®¶åœ¨åœ°é¢ï¼Œåœ¨åœŸç‹¼æ—¶é—´å†…ï¼Œå¯ä»¥è·³è·ƒ</returns>
+    private bool CanJump()
+    {
+        return GetTimer(TimerType.LastOnGround) > 0 && !isJumping && canJump && (!isHitBlock || hitSide == 2);
+    }
+
+    private void HandleWallJumpInput()
+    {
+        if (GetTimer(TimerType.LastPressWallJump) <= 0)
             return;
+
+        if (canWallJump())
+        {
+            isWallJumping = true;
         }
     }
 
-    /// <summary>
-    /// ÅĞ¶ÏÍæ¼Ò´ËÊ±ÊÇ·ñ¿ÉÒÔÌøÔ¾
-    /// </summary>
-    /// <returns>Èç¹ûÍæ¼ÒÔÚµØÃæ£¬ÔÚÍÁÀÇÊ±¼äÄÚ£¬¿ÉÒÔÌøÔ¾</returns>
-    private bool CanJump()
+    private bool canWallJump()
     {
-        return GetTimer(TimerType.LastOnGround) > 0 && !isJumping;
+        return canJump && isHitBlock && hitSide != 2;
     }
 
     #endregion
 
-    #region µØ¿é·½·¨
+    #region åœ°å—æ–¹æ³•
 
     /// <summary>
-    /// ÓÃÀ´×ö½ÇÉ«µÄĞı×ª
+    /// ç”¨æ¥åšè§’è‰²çš„æ—‹è½¬
     /// </summary>
-    /// <param name="number">0,1,2,3·Ö±ğ´ú±íÍæ¼ÒÅö×²BlockÄÄÒ»²àÓ¦¸Ã¶ÔÓ¦µÄĞı×ª½Ç¶È¡£
-    /// 0-ÎŞ 1-×ó²à-90¡ã£¬2-ÉÏ²à-0¡ã£¬3-ÓÒ²à- -90¶È£¬4-ÏÂ²à-180¡ã</param>
+    /// <param name="number">0,1,2,3åˆ†åˆ«ä»£è¡¨ç©å®¶ç¢°æ’Blockå“ªä¸€ä¾§åº”è¯¥å¯¹åº”çš„æ—‹è½¬è§’åº¦ã€‚
+    /// 0-æ—  1-å·¦ä¾§-90Â°ï¼Œ2-ä¸Šä¾§-0Â°ï¼Œ3-å³ä¾§- -90åº¦ï¼Œ4-ä¸‹ä¾§-180Â°</param>
     public void PlayerRotate(int number)
     {
         if (rotatePos == null)
@@ -381,28 +416,28 @@ public class Player : MonoBehaviour
             return;
         }
 
-        // ¼ÆËãÄ¿±ê½Ç¶È
+        // è®¡ç®—ç›®æ ‡è§’åº¦
         float targetAngle = 0f;
         switch (number)
         {
-            case 1: targetAngle = 90f; break;    // ×ó²à
-            case 2: targetAngle = 0f; break;     // ÉÏ²à
-            case 3: targetAngle = -90f; break;   // ÓÒ²à
-            case 4: targetAngle = 180f; break;   // ÏÂ²à
+            case 1: targetAngle = 90f; break;    // å·¦ä¾§
+            case 2: targetAngle = 0f; break;     // ä¸Šä¾§
+            case 3: targetAngle = -90f; break;   // å³ä¾§
+            case 4: targetAngle = 180f; break;   // ä¸‹ä¾§
             default: targetAngle = 0f; break;
         }
 
-        // Èç¹û½Ç¶ÈÃ»ÓĞ±ä»¯£¬Ö±½Ó·µ»Ø
+        // å¦‚æœè§’åº¦æ²¡æœ‰å˜åŒ–ï¼Œç›´æ¥è¿”å›
         if (Mathf.Approximately(transform.eulerAngles.z, targetAngle))
             return;
 
-        // ¼ÆËãµ±Ç°½Ç¶ÈÓëÄ¿±ê½Ç¶ÈµÄ²îÖµ
+        // è®¡ç®—å½“å‰è§’åº¦ä¸ç›®æ ‡è§’åº¦çš„å·®å€¼
         float currentAngle = transform.eulerAngles.z;
         float angleDif = targetAngle - currentAngle;
         while (angleDif > 180) angleDif -= 360;
         while (angleDif < -180) angleDif += 360;
 
-        // Ê¹ÓÃRotateAroundÎ§ÈÆrotatePosĞı×ª
+        // ä½¿ç”¨RotateAroundå›´ç»•rotatePosæ—‹è½¬
         transform.RotateAround(rotatePos.position, Vector3.forward, angleDif);
     }
 
@@ -489,11 +524,162 @@ public class Player : MonoBehaviour
     }
 
     #endregion
+
+    #region åœ°å—æ–¹æ³•
+
+    /// <summary>
+    /// ç”¨æ¥åšè§’è‰²çš„æ—‹è½¬
+    /// </summary>
+    /// <param name="number">0,1,2,3åˆ†åˆ«ä»£è¡¨ç©å®¶ç¢°æ’Blockå“ªä¸€ä¾§åº”è¯¥å¯¹åº”çš„æ—‹è½¬è§’åº¦ã€‚
+    /// 0-æ—  1-å·¦ä¾§-90Â°ï¼Œ2-ä¸Šä¾§-0Â°ï¼Œ3-å³ä¾§- -90åº¦ï¼Œ4-ä¸‹ä¾§-180Â°</param>
+    public void PlayerRotate(int number)
+    {
+        if (rotatePos == null)
+        {
+            return;
+        }
+
+        // è®¡ç®—ç›®æ ‡è§’åº¦
+        float targetAngle = 0f;
+        switch (number)
+        {
+            case 1: targetAngle = 90f; break;    // å·¦ä¾§
+            case 2: targetAngle = 0f; break;     // ä¸Šä¾§
+            case 3: targetAngle = -90f; break;   // å³ä¾§
+            case 4: targetAngle = 180f; break;   // ä¸‹ä¾§
+            default: targetAngle = 0f; break;
+        }
+
+        // å¦‚æœè§’åº¦æ²¡æœ‰å˜åŒ–ï¼Œç›´æ¥è¿”å›
+        if (Mathf.Approximately(transform.eulerAngles.z, targetAngle))
+            return;
+
+        // è®¡ç®—å½“å‰è§’åº¦ä¸ç›®æ ‡è§’åº¦çš„å·®å€¼
+        float currentAngle = transform.eulerAngles.z;
+        float angleDif = targetAngle - currentAngle;
+        while (angleDif > 180) angleDif -= 360;
+        while (angleDif < -180) angleDif += 360;
+
+        // ä½¿ç”¨RotateAroundå›´ç»•rotatePosæ—‹è½¬
+        transform.RotateAround(rotatePos.position, Vector3.forward, angleDif);
+    }
+
+    private void HandlePlayerRotation()
+    {
+        if (isHitBlock)
+        {
+            isWallMove = true;
+        }
+        else
+        {
+            isWallMove = false;
+        }
+    }
+
+    private void HandleBlockSideChange()
+    {
+        if (block == null) 
+            return;
+
+        blockCornerPos = new Vector2[4];
+        blockCornerPos = block.GetCornerPos();
+
+        if (isFacingRight) 
+        {
+            switch (hitSide)
+            {
+                case 1:
+                    if (changePos.position.y > blockCornerPos[0].y)
+                    {
+                        isRightChange = true;
+                    }
+                    break;
+                case 2:
+                    if (changePos.position.x > blockCornerPos[1].x)
+                    {
+                        isRightChange = true;
+                    }
+                    break;
+                case 3:
+                    if (changePos.position.y < blockCornerPos[2].y)
+                    {
+                        isRightChange = true;
+                    }
+                    break;
+                case 4:
+                    if (changePos.position.x > blockCornerPos[2].x) 
+                    {
+                        isLeftChange = true;
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            switch (hitSide)
+            {
+                case 1:
+                    if (changePos.position.y < blockCornerPos[3].y) 
+                    {
+                        isLeftChange = true;
+                    }
+                    break;
+                case 2:
+                    if (changePos.position.x < blockCornerPos[0].x)
+                    {
+                        isLeftChange = true;
+                    }
+                    break;
+                case 3:
+                    if (changePos.position.y > blockCornerPos[1].y) 
+                    {
+                        isLeftChange = true;
+                    }
+                    break;
+                case 4:
+                    if (changePos.position.x < blockCornerPos[3].x) 
+                    {
+                        isRightChange = true;
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void HandlePlayerLeaving()
+    {
+        if (GetTimer(TimerType.LastPressLeave) <= 0)
+            return;
+        
+        if (CanLeave())
+        {
+            isLeaving = true;
+        }
+    }
+
+    private bool CanLeave()
+    {
+        return isHitBlock && !canJump && hitSide != 2;
+    }
+    
+    public void ResetPlayerBlock()
+    {
+        isHitBlock = false;
+        hitSide = 0;
+        hasChanged = false;
+        block = null;
+        blockCornerPos = null;
+    }
+
+    #endregion
 }
 
 public enum TimerType
 {
     LastPressJump,
+    LastPressLeave,
+    LastPressWallJump,
     JumpInterval,
     LastOnGround,
+    LeaveBlockCoolDown,
 }

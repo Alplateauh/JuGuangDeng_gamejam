@@ -7,6 +7,7 @@ public class Block : MonoBehaviour
 {
     private Collider2D collider;
     private Bounds bounds;
+    private Player player;
     
     public BlockType blockType;
     public Vector2 checkArea;

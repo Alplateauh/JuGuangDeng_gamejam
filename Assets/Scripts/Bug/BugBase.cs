@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -26,8 +27,8 @@ public class BugBase : MonoBehaviour
     [Min(0)]
     public float AnimTime;
     
-    [Range(1, 10)]
-    public int rayCount;
+    [Min(1)]
+    public int rayCount = 1;
     
     protected float tileWidth;
 
@@ -45,6 +46,9 @@ public class BugBase : MonoBehaviour
     protected int tileCount;
 
     protected bool isCircle;
+
+    [Min(1)]
+    public float RayScale;
     private void Awake()
     {
         _Volume = FindObjectOfType<Volume>();
@@ -77,7 +81,7 @@ public class BugBase : MonoBehaviour
                     float angle = i * angleStep;
                     Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
         
-                    RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, RAY_DISTANCE * 2, playerLayer);
+                    RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, RAY_DISTANCE * RayScale, playerLayer);
                     if (hit.collider != null && hit.collider.CompareTag("Player"))
                     {
                         playerClicked = true;
@@ -90,7 +94,7 @@ public class BugBase : MonoBehaviour
                 foreach (Vector2 origin in rayOrigins)
                 {
 
-                    RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.up, RAY_DISTANCE, playerLayer);
+                    RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.up, RAY_DISTANCE* RayScale, playerLayer);
                     if (hit.collider != null && hit.collider.CompareTag("Player"))
                     {
                         playerClicked = true;
@@ -138,6 +142,45 @@ public class BugBase : MonoBehaviour
         return origins;
     }
     
+       protected List<Vector3Int> GetAllTiles()
+        {
+            List<Vector3Int> positions = new List<Vector3Int>();
+            
+            if (tilemap != null)
+            {
+                BoundsInt bounds = tilemap.cellBounds;
+                foreach (var position in bounds.allPositionsWithin)
+                {
+                    if (tilemap.HasTile(position))
+                    {
+                        positions.Add(position);
+                    }
+                }
+                positions.Sort((a, b) => a.x.CompareTo(b.x));
+            }
+            
+            return positions;
+        }
+        
+        
+        protected void ChangeTileColor(Vector3Int position, float saturationDelta)
+        {
+            if (tilemap == null) return;
+            
+            Color currentColor = tilemap.GetColor(position);
+    
+            Color.RGBToHSV(currentColor, out float h, out float s, out float v);
+    
+            s = Mathf.Clamp01(s + saturationDelta / 100f); // 注意：除以100，因为你的滑块是0-100
+    
+            Color newColor = Color.HSVToRGB(h, s, v);
+            newColor.a = currentColor.a;
+            
+            tilemap.RemoveTileFlags(position, TileFlags.LockColor);
+            tilemap.SetColor(position, newColor);
+            
+        }
+    
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -152,16 +195,16 @@ public class BugBase : MonoBehaviour
                 Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
                 Vector2 rayOrigin = transform.position;
                 
-                Gizmos.DrawRay(rayOrigin, direction * RAY_DISTANCE * 2);
+                Gizmos.DrawRay(rayOrigin, direction * RAY_DISTANCE * RayScale);
 
                 Gizmos.DrawWireSphere(rayOrigin, 0.02f);
                 
-                Vector2 rayEnd = rayOrigin + direction * RAY_DISTANCE * 2;
+                Vector2 rayEnd = rayOrigin + direction * RAY_DISTANCE * RayScale;
                 Gizmos.DrawWireSphere(rayEnd, 0.01f);
             }
             
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, RAY_DISTANCE * 2);
+            Gizmos.DrawWireSphere(transform.position, RAY_DISTANCE * RayScale);
         }
         else
         {
@@ -169,7 +212,7 @@ public class BugBase : MonoBehaviour
         
             foreach (Vector2 origin in origins)
             {
-                Gizmos.DrawRay(origin, Vector2.up * RAY_DISTANCE);
+                Gizmos.DrawRay(origin, Vector2.up * RAY_DISTANCE * RayScale);
                 Gizmos.DrawWireCube(origin, new Vector3(0.05f, 0.05f, 0.05f));
             }
         }

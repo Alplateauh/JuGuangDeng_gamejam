@@ -16,10 +16,13 @@ public class PlayerMovementData : ScriptableObject
     [Range(0.01f, 1)] public float deccelInAir; //在空中减速时水平加速度会乘该比值
     public float speedThreshold; //最小速度阈值
     public float adsorbeOutTime;
+    public float leaveBlockCooldown;
+    [Range(0.001f, 0.5f)] public float leaveInputBufferTime;
     
     [Space(20)]
     [Header("Jump Info")]
     public float jumpHeight; //跳跃高度
+    public float wallJumpForce;
     public float jumpTimeToApex; //跳跃至最大高度的时间
     public int jumpCount = 2; //最多跳跃次数
     [Range(0f, 1f)] public float coyoteTime; //土狼时间

@@ -46,7 +46,7 @@ public class Player_IdleState : PlayerState
         if (player.faceDir != 0)
             stateMachine.ChangeState(player.moveState);
 
-        if (player.isJumping) 
+        if (player.canJump && player.isJumping)   
             stateMachine.ChangeState(player.jumpState);
 
         if (!player.isGround && !player.isWallMove)
