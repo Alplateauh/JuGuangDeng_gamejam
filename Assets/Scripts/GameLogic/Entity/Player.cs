@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 
     public Animator animator { get; private set; }
     public Rigidbody2D rb { get; private set; }
+    public Collider2D collider { get; private set; }
     public Check check { get; private set; }
 
     #endregion
@@ -24,17 +25,19 @@ public class Player : MonoBehaviour
     #region 地块相关
 
     [Header("地块相关参数")]
-    public Block block;
-    public Vector2[] blockCornerPos;
     public Transform rotatePos;
-    public Transform changePos;
+    public Vector2 blockHitPos;
+    public Vector2 lastEdgePos;
+    public bool hasHitPos;
+    public bool hasEdgePos;
     public bool isHitBlock = false; // 是否碰到Block
-    public int hitSide; // 代表玩家碰撞到的Block那一边。0-无，1-左侧，2-上侧，3-右侧，4-下侧
-    [HideInInspector] public int P_lastHitSide; // 玩家在Block的上一条边
-     public bool isWallMove = false; // 是否在Block上移动
-    [HideInInspector] public bool isRightChange = false; // 玩家是否顺时针换边
-    [HideInInspector] public bool isLeftChange = false; // 玩家是否逆时针换边
-    [HideInInspector] public bool hasChanged = false; // 玩家是否在不停止的移动中换过边，如果断过移动状态则为false
+    public bool isFirstHit = false; // 是否碰到Block
+    public bool isWallMove = false; // 是否进入Block上移动的状态
+    public int playerRot; // 代表玩家碰撞到的Block边的旋转状态。0-无，1-头朝左侧，2-上侧，3-右侧，4-下侧
+    public bool isLeftRotate = false;
+    public bool isRightRotate = false;
+    public bool isLeftChange = false;
+    public bool isRightChange = false;
     public bool isLeaving = false;
 
     #endregion
@@ -72,7 +75,7 @@ public class Player : MonoBehaviour
     // 玩家空闲状态
     public Player_IdleState idleState { get; private set; }
     // 玩家移动状态
-    public Player_MoveState moveState { get; private set; }
+    //public Player_MoveState moveState { get; private set; }
     // 玩家跳跃状态
     public Player_JumpState jumpState { get; private set; }
     // 玩家下落状态
@@ -84,6 +87,7 @@ public class Player : MonoBehaviour
     // 玩家在墙壁上离开的状态
     public Player_WallLeaveState wallLeaveState { get; private set; }
     // 玩家转移Block的边的状态
+    public Player_ChangeRotation changeRotationState { get; private set; }
     public Player_ChangeSideState changeSideState { get; private set; }
 
     #endregion
@@ -109,12 +113,13 @@ public class Player : MonoBehaviour
         // 初始化状态机状态
         stateMachine = new PlayerFSM();
         idleState = new Player_IdleState(this, stateMachine, "Idle");
-        moveState = new Player_MoveState(this, stateMachine, "Move");
+        //moveState = new Player_MoveState(this, stateMachine, "Move");
         jumpState = new Player_JumpState(this, stateMachine, "Jump");
         fallState = new Player_FallState(this, stateMachine, "fall");
         wallMoveState = new Player_WallMoveState(this, stateMachine, "wallMove");
         wallJumpState = new Player_WallJumpState(this, stateMachine, "wallJump");
         wallLeaveState = new Player_WallLeaveState(this, stateMachine, "wallLeave");
+        changeRotationState = new Player_ChangeRotation(this, stateMachine, "changeRotation");
         changeSideState = new Player_ChangeSideState(this, stateMachine, "changeSide");
     }
 
@@ -122,6 +127,7 @@ public class Player : MonoBehaviour
     {
         // 设置引用
         animator = GetComponentInChildren<Animator>();
+        collider = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
         check = GetComponent<Check>();
 
@@ -150,14 +156,13 @@ public class Player : MonoBehaviour
         FlipCheck();
         HandleJumpInput();
         HandleWallJumpInput();
-        HandlePlayerRotation();
-        HandleBlockSideChange();
         HandlePlayerLeaving();
 
         // 调试日志，输出当前状态
         Debug.Log(stateMachine.currentState);
         // Debug.Log(isFacingRight);
         //Debug.Log(GetTimer(TimerType.LeaveBlockCoolDown));
+        //Debug.Log("PlayerRot: " + playerRot);
     }
 
     private void FixedUpdate()
@@ -224,7 +229,6 @@ public class Player : MonoBehaviour
         if (((faceDir > 0 && !isFacingRight) || (faceDir < 0 && isFacingRight)) && canFlip)
         {
             HFlip();
-            hasChanged = false;
         }
     }
     
@@ -282,26 +286,6 @@ public class Player : MonoBehaviour
 
         // 将旋转角度标准化到0-360度
         float normalizedRotation = (currentRotation % 360 + 360) % 360;
-
-        // 判断玩家经过Block下方时特殊情况的处理
-        if (hasChanged)
-        {
-            if (hitSide == 4)
-            {
-                if (isFacingRight)
-                    faceDir = -1;
-                else
-                    faceDir = 1;
-            }
-            else if (hitSide == 1 && !isFacingRight && P_lastHitSide == 4)
-            {
-                faceDir = 1;
-            }
-            else if (hitSide == 3 && isFacingRight && P_lastHitSide == 4) 
-            {
-                faceDir = -1;
-            }
-        }
         
         // 根据旋转角度返回对应的移动方向
         if (normalizedRotation >= 315 || normalizedRotation < 45)
@@ -374,7 +358,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void HandleJumpInput()
     {
-        if (isHitBlock && (hitSide == 1 || hitSide == 3)) 
+        if (isHitBlock && (playerRot == 1 || playerRot == 3)) 
         {
             OpenOrCloseJumpInputWindow(false);
         }
@@ -402,7 +386,7 @@ public class Player : MonoBehaviour
     /// <returns>如果玩家在地面，在土狼时间内，可以跳跃</returns>
     private bool CanJump()
     {
-        return GetTimer(TimerType.LastOnGround) > 0 && !isJumping && canJump && (!isHitBlock || hitSide == 2);
+        return GetTimer(TimerType.LastOnGround) > 0 && !isJumping && canJump && (!isHitBlock || playerRot == 2);
     }
 
     private void HandleWallJumpInput()
@@ -418,13 +402,13 @@ public class Player : MonoBehaviour
 
     private bool canWallJump()
     {
-        return canJump && isHitBlock && hitSide != 2;
+        return canJump && isHitBlock && playerRot != 2;
     }
     
     #endregion
 
     #region 地块方法
-
+    
     /// <summary>
     /// 用来做角色的旋转
     /// </summary>
@@ -437,6 +421,12 @@ public class Player : MonoBehaviour
             return;
         }
 
+        if (number == 4)
+        {
+            transform.localScale = new Vector3(transform.localScale.x, -1f, transform.localScale.z);
+            return;
+        }
+        
         // 计算目标角度
         float targetAngle = 0f;
         switch (number)
@@ -444,7 +434,6 @@ public class Player : MonoBehaviour
             case 1: targetAngle = 90f; break;    // 左侧
             case 2: targetAngle = 0f; break;     // 上侧
             case 3: targetAngle = -90f; break;   // 右侧
-            case 4: targetAngle = 180f; break;   // 下侧
             default: targetAngle = 0f; break;
         }
 
@@ -462,88 +451,50 @@ public class Player : MonoBehaviour
         transform.RotateAround(rotatePos.position, Vector3.forward, angleDif);
     }
 
-    private void HandlePlayerRotation()
+    public void ResolveOverlaps()
     {
-        if (isHitBlock)
-        {
-            isWallMove = true;
-        }
-        else
-        {
-            isWallMove = false;
-        }
-    }
+        Collider2D playerCollider = collider; 
+        if (playerCollider == null) return;
 
-    private void HandleBlockSideChange()
-    {
-        if (block == null) 
-            return;
+        // 找到可能重叠的地形 colliders（用 bounds 扩张一点作筛选）
+        Bounds b = playerCollider.bounds;
+        Vector2 center = b.center;
+        Vector2 size = b.size + Vector3.one * 0.02f; // small padding
+        Collider2D[] hits = Physics2D.OverlapBoxAll(center, size, transform.eulerAngles.z, LayerMask.GetMask("Ground"));
 
-        blockCornerPos = new Vector2[4];
-        blockCornerPos = block.GetCornerPos();
+        Vector2 totalNudge = Vector2.zero;
+        bool pushed = false;
 
-        if (isFacingRight) 
+        foreach (Collider2D other in hits)
         {
-            switch (hitSide)
+            if (other == playerCollider) continue;
+
+            // 更精确地用 ColliderDistance2D
+            ColliderDistance2D dist = playerCollider.Distance(other);
+            if (dist.isOverlapped)
             {
-                case 1:
-                    if (changePos.position.y > blockCornerPos[0].y)
-                    {
-                        isRightChange = true;
-                    }
-                    break;
-                case 2:
-                    if (changePos.position.x > blockCornerPos[1].x)
-                    {
-                        isRightChange = true;
-                    }
-                    break;
-                case 3:
-                    if (changePos.position.y < blockCornerPos[2].y)
-                    {
-                        isRightChange = true;
-                    }
-                    break;
-                case 4:
-                    if (changePos.position.x > blockCornerPos[2].x) 
-                    {
-                        isLeftChange = true;
-                    }
-                    break;
+                // dist.normal 指向玩家相对于 other 的分离方向
+                float penetration = -dist.distance; // distance 是负值表示重叠深度
+                Vector2 nudge = dist.normal * penetration;
+
+                // 限制每次推离量，避免弹出过远
+                float maxNudge = 0.5f;
+                if (nudge.magnitude > maxNudge) nudge = nudge.normalized * maxNudge;
+
+                totalNudge += nudge;
+                pushed = true;
+                Debug.Log($"[ResolveOverlaps] overlap with {other.name}, nudge {nudge}");
             }
         }
-        else
+
+        if (pushed)
         {
-            switch (hitSide)
-            {
-                case 1:
-                    if (changePos.position.y < blockCornerPos[3].y) 
-                    {
-                        isLeftChange = true;
-                    }
-                    break;
-                case 2:
-                    if (changePos.position.x < blockCornerPos[0].x)
-                    {
-                        isLeftChange = true;
-                    }
-                    break;
-                case 3:
-                    if (changePos.position.y > blockCornerPos[1].y) 
-                    {
-                        isLeftChange = true;
-                    }
-                    break;
-                case 4:
-                    if (changePos.position.x < blockCornerPos[3].x) 
-                    {
-                        isRightChange = true;
-                    }
-                    break;
-            }
+            Vector2 newPos = rb.position + totalNudge;
+            rb.MovePosition(newPos);
+            Debug.Log($"[ResolveOverlaps] applied total nudge {totalNudge} -> newPos {newPos}");
         }
     }
-
+    
     private void HandlePlayerLeaving()
     {
         if (GetTimer(TimerType.LastPressLeave) <= 0)
@@ -557,16 +508,13 @@ public class Player : MonoBehaviour
 
     private bool CanLeave()
     {
-        return isHitBlock && !canJump && hitSide != 2;
+        return isHitBlock && !canJump && playerRot != 2;
     }
     
     public void ResetPlayerBlock()
     {
         isHitBlock = false;
-        hitSide = 0;
-        hasChanged = false;
-        block = null;
-        blockCornerPos = null;
+        playerRot = 0;
     }
 
     #endregion

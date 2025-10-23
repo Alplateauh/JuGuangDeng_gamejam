@@ -6,7 +6,6 @@ using UnityEngine;
 public class Block : MonoBehaviour
 {
     private Collider2D collider;
-    private Bounds bounds;
     private Player player;
     
     public BlockType blockType;
@@ -19,65 +18,25 @@ public class Block : MonoBehaviour
         collider = GetComponent<Collider2D>();
     }
 
-    private void Update()
+    private void OnCollisionEnter2D(Collision2D playerCol)
     {
-        CalculateCornerPositions();
-        HandlePlayerLeave();
-        HandlePlayerEnter();
-    }
-    
-    
-    private void CalculateCornerPositions()
-    {
-        bounds = collider.bounds;
-        
-        cornerPos = new Vector2[4];
-        // 左上角
-        cornerPos[0] = new Vector2(bounds.min.x, bounds.max.y);
-        // 右上角
-        cornerPos[1] = new Vector2(bounds.max.x, bounds.max.y);
-        // 右下角
-        cornerPos[2] = new Vector2(bounds.max.x, bounds.min.y);
-        // 左下角
-        cornerPos[3] = new Vector2(bounds.min.x, bounds.min.y);
-
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     Debug.Log("corner" + i + ":" + cornerPos[i].x + ", " + cornerPos[i].y);
-        // }
-    }
-    
-    public Vector2[] GetCornerPos()
-    {
-        return cornerPos;
-    }
-
-    private void HandlePlayerEnter()
-    {
-        Collider2D playerCol = Physics2D.OverlapBox(this.transform.position, checkArea, 0, playerLayerMask);
-        
-        if (playerCol != null) 
-            player = playerCol.GetComponent<Player>();
-        
-        if (player != null && player.isHitBlock == false && player.GetTimer(TimerType.LeaveBlockCoolDown) < 0)
+        int layerMaskOfCol = 1 << playerCol.gameObject.layer;
+        if ((playerLayerMask.value & layerMaskOfCol) != 0)
         {
-            player.isHitBlock = true;
-            player.block = this;
+            player = playerCol.gameObject.GetComponent<Player>();
+            if (player != null)
+                player.isHitBlock = true;
         }
     }
-    
-    private void HandlePlayerLeave()
+
+    private void OnCollisionExit2D(Collision2D playerCol)
     {
-        Collider2D playerCol = Physics2D.OverlapBox(this.transform.position, checkArea, 0f, playerLayerMask);
-        
-        if (playerCol == null)
+        int layerMaskOfCol = 1 << playerCol.gameObject.layer;
+        if ((playerLayerMask.value & layerMaskOfCol) != 0)
         {
             if (player != null)
             {
-                if (player.block == this)
-                {
-                    player.ResetPlayerBlock();
-                }
+                player.isHitBlock = false;
                 player = null;
             }
         }

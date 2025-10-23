@@ -35,14 +35,11 @@ public class Player_FallState : PlayerState
         player.rb.velocity = new Vector2(player.rb.velocity.x,
             Mathf.Max(player.rb.velocity.y, -movementData.maxFallSpeed * 1f / Time.timeScale));
         
-        if (player.isGround) 
-            player.stateMachine.ChangeState(player.moveState);
-        
         if (player.isJumping)
             stateMachine.ChangeState(player.jumpState);
 
         if (player.isWallMove) 
-            stateMachine.ChangeState(player.wallMoveState);
+            player.stateMachine.ChangeState(player.wallMoveState);
     }
     
     public override void FixedUpdate()

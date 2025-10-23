@@ -19,7 +19,7 @@ public class Player_WallJumpState : PlayerState
         player.SetPlayerGravityScale(movementData.gravityScale);
         
         float force = movementData.wallJumpForce;
-        switch (player.hitSide)
+        switch (player.playerRot)
         {
             case 1:
                 player.transform.position = new Vector3(player.transform.position.x - player.playerLength / 2,

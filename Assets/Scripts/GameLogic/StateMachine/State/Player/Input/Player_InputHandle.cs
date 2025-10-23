@@ -44,10 +44,10 @@ public class Player_InputHandle : MonoBehaviour
             player.faceDir = input.x > 0 ? 1 : input.x < 0 ? -1 : 0;
         
         // ×´Ì¬ÇĞ»»
-        if (player.stateMachine.currentState == player.idleState && player.faceDir != 0)
-        {
-            player.stateMachine.ChangeState(player.moveState);
-        }
+        // if (player.stateMachine.currentState == player.idleState && player.faceDir != 0)
+        // {
+        //     player.stateMachine.ChangeState(player.moveState);
+        // }
     }
     
     private void OnJumpInput()
