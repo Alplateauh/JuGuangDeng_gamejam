@@ -25,7 +25,11 @@ public class Player_ChangeSideState : PlayerState
     {
         base.Update();
         
-        stateMachine.ChangeState(player.wallMoveState);
+        player.rb.velocity = Vector2.zero;
+        TeleportPlayer(player.hitSide);
+
+        if (player.hitSide != lastHitSide || !player.hitBlock)
+            stateMachine.ChangeState(player.idleState);
     }
 
     public override void FixedUpdate()

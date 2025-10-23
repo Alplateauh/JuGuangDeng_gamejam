@@ -19,7 +19,7 @@ public class Check : MonoBehaviour
     [SerializeField] private Transform _frontBlockCheckPoint;
     [SerializeField] private Vector2 _frontBlockCheckSize;
     [SerializeField] private Transform _headBlockCheckPoint;
-    [SerializeField] private Vector2 _headBlockCheckSize;
+    [FormerlySerializedAs("_headtBlockCheckSize")] [SerializeField] private Vector2 _headBlockCheckSize;
     
     [Header("层和标签")]
     [SerializeField] private LayerMask _groundLayer;
@@ -57,7 +57,7 @@ public class Check : MonoBehaviour
 
     private void BlockCheck()
     {
-        if (player.isHitBlock) 
+        if (player.hitBlock) 
         {
             if (FrontBlockCheck())
             {

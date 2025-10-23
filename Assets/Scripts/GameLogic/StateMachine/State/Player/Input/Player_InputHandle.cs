@@ -2,7 +2,7 @@ using System.Data.Common;
 using UnityEngine;
 
 /// <summary>
-/// ¸ºÔğ´¦ÀíÍæ¼ÒÏà¹ØµÄÊäÈë
+/// è´Ÿè´£å¤„ç†ç©å®¶ç›¸å…³çš„è¾“å…¥
 /// </summary>
 public class Player_InputHandle : MonoBehaviour
 {
@@ -32,10 +32,10 @@ public class Player_InputHandle : MonoBehaviour
 
     private void OnMovePerformed()
     {
-        // ¶ÁÈ¡µ±Ç°ÊäÈëÏòÁ¿£¬Ö»µ÷ÓÃÒ»´Î
+        // è¯»å–å½“å‰è¾“å…¥å‘é‡ï¼Œåªè°ƒç”¨ä¸€æ¬¡
         Vector2 input = InputMgr.GetInstance().control.Player.Move.ReadValue<Vector2>();
         
-        // Ë®Æ½·½ÏòÅĞ¶Ï£¨A/D¼üÓÅÏÈ£©
+        // æ°´å¹³æ–¹å‘åˆ¤æ–­ï¼ˆA/Dé”®ä¼˜å…ˆï¼‰
         if (Input.GetKeyDown(KeyCode.D))
             player.faceDir = 1;
         else if (Input.GetKeyDown(KeyCode.A))
@@ -43,7 +43,7 @@ public class Player_InputHandle : MonoBehaviour
         else
             player.faceDir = input.x > 0 ? 1 : input.x < 0 ? -1 : 0;
         
-        // ×´Ì¬ÇĞ»»
+        // çŠ¶æ€åˆ‡æ¢
         if (player.stateMachine.currentState == player.idleState && player.faceDir != 0)
         {
             player.stateMachine.ChangeState(player.moveState);
@@ -68,7 +68,7 @@ public class Player_InputHandle : MonoBehaviour
     
     private void OnMoveCanceled()
     {
-        // Ë®Æ½È¡ÏûÂß¼­
+        // æ°´å¹³å–æ¶ˆé€»è¾‘
         if (Input.GetKey(KeyCode.A) && Input.GetAxis("Horizontal") > 0)
             player.faceDir = -1;
         else if (Input.GetKey(KeyCode.D) && Input.GetAxis("Horizontal") < 0)

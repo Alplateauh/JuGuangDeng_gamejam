@@ -13,6 +13,9 @@ public class Block : MonoBehaviour
     public Vector2 checkArea;
     public LayerMask playerLayerMask;
     private Vector2[] cornerPos;
+    
+    
+    public Player player;
 
     private void Start()
     {
@@ -41,10 +44,10 @@ public class Block : MonoBehaviour
         // 左下角
         cornerPos[3] = new Vector2(bounds.min.x, bounds.min.y);
 
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     Debug.Log("corner" + i + ":" + cornerPos[i].x + ", " + cornerPos[i].y);
-        // }
+        for (int i = 0; i < 4; i++)
+        {
+            Debug.Log("corner" + i + ":" + cornerPos[i].x + ", " + cornerPos[i].y);
+        }
     }
     
     public Vector2[] GetCornerPos()
@@ -55,31 +58,22 @@ public class Block : MonoBehaviour
     private void HandlePlayerEnter()
     {
         Collider2D playerCol = Physics2D.OverlapBox(this.transform.position, checkArea, 0, playerLayerMask);
-        
-        if (playerCol != null) 
-            player = playerCol.GetComponent<Player>();
-        
-        if (player != null && player.isHitBlock == false && player.GetTimer(TimerType.LeaveBlockCoolDown) < 0)
+        if (playerCol != null && player.hitBlock == false)
         {
-            player.isHitBlock = true;
+            player.hitBlock = true;
             player.block = this;
         }
     }
     
     private void HandlePlayerLeave()
     {
-        Collider2D playerCol = Physics2D.OverlapBox(this.transform.position, checkArea, 0f, playerLayerMask);
-        
-        if (playerCol == null)
+        Collider2D playerCol = Physics2D.OverlapBox(this.transform.position, checkArea, 0, playerLayerMask);
+        if (playerCol == null && player.hitBlock == true)
         {
-            if (player != null)
-            {
-                if (player.block == this)
-                {
-                    player.ResetPlayerBlock();
-                }
-                player = null;
-            }
+            player.hitBlock = false;
+            player.hitSide = 0;
+            player.block = null;
+            player.blockCornerPos = null;
         }
     }
     

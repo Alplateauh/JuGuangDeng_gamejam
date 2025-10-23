@@ -13,15 +13,6 @@ public class Player_IdleState : PlayerState
     {
         base.Enter();
         player.isJumping = false;
-        player.hasChanged = false;
-    }
-
-    public override void Update()
-    {
-        base.Update();
-        
-        if (player.isWallMove) 
-            HandlePlayerRotation();
         
         if (player.isWallMove)
         {
@@ -43,18 +34,20 @@ public class Player_IdleState : PlayerState
         {
             player.rb.velocity = new Vector2(0f, player.rb.velocity.y);
         }
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (player.isWallMove) 
+            HandlePlayerRotation();
         
         if (player.faceDir != 0)
             stateMachine.ChangeState(player.moveState);
 
         if (player.canJump && player.isJumping)   
             stateMachine.ChangeState(player.jumpState);
-
-        if (player.canJump && player.isWallJumping && player.isHitBlock)
-            stateMachine.ChangeState(player.wallJumpState);
-
-        if (!player.canJump && player.isLeaving && player.isHitBlock) 
-            stateMachine.ChangeState(player.wallLeaveState);
 
         if (!player.isGround && !player.isWallMove)
             stateMachine.ChangeState(player.fallState);

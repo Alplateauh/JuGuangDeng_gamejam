@@ -7,6 +7,11 @@ public class GCAutoCollectPlugin : BasePlugin
 {
     public override void Effect()
     {
-        Debug.Log("X0RegisterPlugin Effect");
+        Debug.Log("GCAutoCollectPlugin Effect");
+    }
+
+    public override void RemoveEffect()
+    {
+        Debug.Log("GCAutoCollectPlugin RemoveEffect");
     }
 }
