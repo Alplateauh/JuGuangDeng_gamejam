@@ -32,6 +32,7 @@ public class Check : MonoBehaviour
     [SerializeField] private Transform _probeFrontTransform;
     [SerializeField] private float _probeLen;
     private Vector2 lastProbeHitPoint;
+    private bool canChange;
     
     [Header("层和标签")]
     [SerializeField] private LayerMask _groundLayer;
@@ -60,9 +61,12 @@ public class Check : MonoBehaviour
             }
         }
 
-        BlockCheck();
-        BlockHitCheck();
-        BlockEdgeCheck();
+        if (player.GetTimer(TimerType.LeaveBlockCoolDown) < 0f)
+        {
+            BlockCheck();
+            BlockHitCheck();
+            BlockEdgeCheck();   
+        }
     }
 
     private void FixedUpdate()
@@ -154,10 +158,12 @@ public class Check : MonoBehaviour
 
     private void BlockEdgeCheck()
     {
-        if (player == null || _probeCenterTransform == null || player.playerRot == 0) return;
+        if (player == null || player.playerRot == 0) return;
+
+        if (!CanCheckEdge()) return;
         
         Vector2 downDir = (-_probeCenterTransform.up).normalized * player.transform.localScale.y;
-
+        
         RaycastHit2D hitCenter = Physics2D.Raycast(_probeCenterTransform.position, downDir, _probeLen, _groundLayer);
         bool hitC = hitCenter.collider != null;
         bool hitB = Physics2D.Raycast(_probeBehindTransform.position, downDir, _probeLen, _groundLayer);
@@ -167,8 +173,16 @@ public class Check : MonoBehaviour
         {
             lastProbeHitPoint = hitCenter.point;
         }
-
-        if (hitB && !hitC && !hitF && !player.hasEdgePos)
+        
+        if (hitB && hitC && !hitF)
+        {
+            canChange = true;
+        }
+        else if (!hitB && !hitC && !hitF)
+        {
+            canChange = false;
+        }
+        else if (hitB && !hitC && !hitF && !player.hasEdgePos && canChange)
         {
             player.lastEdgePos = lastProbeHitPoint;
 
@@ -183,9 +197,28 @@ public class Check : MonoBehaviour
                 if (player.isFacingRight) player.isLeftChange = true;
                 else player.isRightChange = true;
             }
-
+            
             player.hasEdgePos = true;
+            canChange = false;
         }
+    }
+
+    private bool CanCheckEdge()
+    {
+        // 只有在WallMove状态下才允许边缘检测
+        if (!player.isWallMove)
+            return false;
+        
+        // 检查是否在跳跃或下落状态
+        if (player.isJumping || player.stateMachine.currentState == player.jumpState || 
+            player.stateMachine.currentState == player.fallState)
+            return false;
+        
+        // 检查是否在其他不允许的状态
+        if (player.isWallJumping || player.isLeaving)
+            return false;
+        
+        return true;
     }
     
     private void HandleFirstBlockHit()
@@ -227,6 +260,8 @@ public class Check : MonoBehaviour
                         player.playerRot = 2;    
                         player.isRightRotate = true;
                     }
+
+                    player.lastRot = 1;
                 }
                 break;
             case 2:
@@ -242,6 +277,7 @@ public class Check : MonoBehaviour
                         player.playerRot = 3;    
                         player.isRightRotate = true;
                     }
+                    player.lastRot = 2;
                 }
                 break;
             case 3:
@@ -257,6 +293,8 @@ public class Check : MonoBehaviour
                          player.playerRot = 4;    
                         player.isRightRotate = true;
                     }
+
+                    player.lastRot = 3;
                 }
                 break;
             case 4:
@@ -272,6 +310,8 @@ public class Check : MonoBehaviour
                         player.playerRot = 3;    
                         player.isLeftRotate = true;
                     }
+                    
+                    player.lastRot = 4;
                 }
                 break;
         }

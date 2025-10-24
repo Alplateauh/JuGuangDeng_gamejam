@@ -25,11 +25,11 @@ public class Player_WallMoveState : PlayerState
     public override void Update()
     {
         base.Update();
-        
+            
         if (player.isFirstHit)
             HandlePlayerRotation();
-        
-        if (player.faceDir == 0) 
+
+        if (player.faceDir == 0)  
             stateMachine.ChangeState(player.idleState);
 
         if (player.canJump && player.isJumping && player.playerRot == 2)  
@@ -62,7 +62,7 @@ public class Player_WallMoveState : PlayerState
     {
         base.Exit();
     }
-
+    
     private void HandlePlayerRotation()
     {
         switch (player.playerRot)

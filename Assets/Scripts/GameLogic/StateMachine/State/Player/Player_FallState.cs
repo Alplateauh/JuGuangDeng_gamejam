@@ -15,6 +15,7 @@ public class Player_FallState : PlayerState
     {
         base.Enter();
         
+        player.SetPlayerGravityScale(movementData.gravityScale);
         player.transform.rotation = Quaternion.Euler(0, 0, 0);
         player.transform.localScale = new Vector3(player.transform.localScale.x, 1, player.transform.localScale.z);
     }

@@ -13,6 +13,8 @@ public class Player_IdleState : PlayerState
     {
         base.Enter();
         player.isJumping = false;
+        player.isContinuousMove = false;
+        player.continuousMoveDir = 0;
     }
 
     public override void Update()

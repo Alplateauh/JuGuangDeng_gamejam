@@ -22,6 +22,11 @@ public class Player : MonoBehaviour
     public float playerLength;
     public bool isGround = false;
 
+    [Header("连续移动相关")]
+    public bool isMove = false;
+    public bool isContinuousMove = false; // 是否处于连续移动状态
+    public int continuousMoveDir = 0; // 连续移动的方向
+        
     #region 地块相关
 
     [Header("地块相关参数")]
@@ -30,6 +35,7 @@ public class Player : MonoBehaviour
     public Vector2 lastEdgePos;
     public bool hasHitPos;
     public bool hasEdgePos;
+    public int lastRot; // 玩家在Block的上一条边
     public bool isHitBlock = false; // 是否碰到Block
     public bool isFirstHit = false; // 是否碰到Block
     public bool isWallMove = false; // 是否进入Block上移动的状态
@@ -45,7 +51,7 @@ public class Player : MonoBehaviour
     #region 转身相关参数
 
     [Header("转身相关参数")]
-    [HideInInspector] public int faceDir;
+    public int faceDir;
     [HideInInspector] public bool canFlip;
     public bool isFacingRight { get; private set; } // 表示玩家当前是否面向右侧
 
@@ -157,12 +163,14 @@ public class Player : MonoBehaviour
         HandleJumpInput();
         HandleWallJumpInput();
         HandlePlayerLeaving();
-
+        
         // 调试日志，输出当前状态
         Debug.Log(stateMachine.currentState);
         // Debug.Log(isFacingRight);
         //Debug.Log(GetTimer(TimerType.LeaveBlockCoolDown));
         //Debug.Log("PlayerRot: " + playerRot);
+        Debug.Log("playerDir: " + faceDir + ", cDir: " + continuousMoveDir);
+        Debug.Log(isFacingRight);
     }
 
     private void FixedUpdate()
@@ -217,7 +225,7 @@ public class Player : MonoBehaviour
 
     private void HFlip()
     {
-        isFacingRight = !isFacingRight;
+        ChangeFacingRight();
         faceDir = isFacingRight ? 1 : -1;
         transform.localScale = isFacingRight
             ? new Vector3(1f, transform.localScale.y, 1f)
@@ -226,10 +234,26 @@ public class Player : MonoBehaviour
 
     private void FlipCheck()
     {
-        if (((faceDir > 0 && !isFacingRight) || (faceDir < 0 && isFacingRight)) && canFlip)
+        if (isContinuousMove)
         {
-            HFlip();
+            if (((continuousMoveDir > 0 && !isFacingRight) || (continuousMoveDir < 0 && isFacingRight)) && canFlip)
+            {
+                HFlip();
+                isContinuousMove = false;
+            }
         }
+        else
+        {
+            if (((faceDir > 0 && !isFacingRight) || (faceDir < 0 && isFacingRight)) && canFlip)
+            {
+                HFlip();
+            }
+        }
+    }
+
+    public void ChangeFacingRight()
+    {
+        isFacingRight = !isFacingRight;
     }
     
     #endregion
@@ -247,8 +271,13 @@ public class Player : MonoBehaviour
         // 获取当前移动方向
         Vector2 moveDirection = GetCurrentMoveDirection();
 
+        float targetSpeed;
         // 计算目标速度
-        float targetSpeed = faceDir * runMaxSpeed;
+        if (isContinuousMove) 
+            targetSpeed = continuousMoveDir * runMaxSpeed;
+        else
+            targetSpeed = faceDir * runMaxSpeed;
+        
         targetSpeed = Mathf.Lerp(GetVelocityInMoveDirection(moveDirection), targetSpeed, lerpAmount);
 
         // 根据目标速度计算加速率
@@ -283,10 +312,10 @@ public class Player : MonoBehaviour
     {
         // 根据角色旋转角度确定移动方向
         float currentRotation = transform.eulerAngles.z;
-
+    
         // 将旋转角度标准化到0-360度
         float normalizedRotation = (currentRotation % 360 + 360) % 360;
-        
+    
         // 根据旋转角度返回对应的移动方向
         if (normalizedRotation >= 315 || normalizedRotation < 45)
         {
@@ -299,6 +328,7 @@ public class Player : MonoBehaviour
         }
         else if (normalizedRotation >= 135 && normalizedRotation < 225)
         {
+            // 实际上以玩家可以旋转的角度是进不来这里的，纯粹为了队形整齐
             // 180度方向 - 向左移动
             return Vector2.left;
         }

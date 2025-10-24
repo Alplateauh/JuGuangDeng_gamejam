@@ -25,13 +25,14 @@ public class Player_WallJumpState : PlayerState
                 player.transform.position = new Vector3(player.transform.position.x - player.playerLength / 2,
                     player.transform.position.y, player.transform.position.z);
                 player.rb.AddForce(force * Vector2.left, ForceMode2D.Impulse);
-                player.faceDir = -1;
                 break;
             case 3:
                 player.transform.position = new Vector3(player.transform.position.x + player.playerLength / 2,
                     player.transform.position.y, player.transform.position.z);
                 player.rb.AddForce(force * Vector2.right, ForceMode2D.Impulse);
-                player.faceDir = 1;
+                break;
+            case 4:
+                stateMachine.ChangeState(player.fallState);
                 break;
         }
     }
@@ -51,7 +52,6 @@ public class Player_WallJumpState : PlayerState
     {
         base.Exit();
         player.isWallJumping = false;
-        player.faceDir = 0;
         player.ResetPlayerBlock();
     }
 }

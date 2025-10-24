@@ -209,7 +209,7 @@ Transform:
   m_GameObject: {fileID: 138280788}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5, y: -0.3499999, z: 0}
+  m_LocalPosition: {x: -0.4, y: -0.3499999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -386,11 +386,15 @@ MonoBehaviour:
   playerHeight: 0.7
   playerLength: 1.5
   isGround: 0
+  isMove: 0
+  isContinuousMove: 0
+  continuousMoveDir: 0
   rotatePos: {fileID: 68877643}
   blockHitPos: {x: 0, y: 0}
   lastEdgePos: {x: 0, y: 0}
   hasHitPos: 0
   hasEdgePos: 0
+  lastRot: 0
   isHitBlock: 0
   isFirstHit: 0
   isWallMove: 0
@@ -416,7 +420,7 @@ Transform:
   m_GameObject: {fileID: 412599714}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.39, y: 2.48, z: 0}
+  m_LocalPosition: {x: 3.43, y: -3.03, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -446,13 +450,13 @@ MonoBehaviour:
   _groundCheckPoint: {fileID: 1548208747}
   _groundCheckSize: {x: 1.2, y: 0.1}
   _frontBlockCheckPoint: {fileID: 1615147823}
-  _frontBlockCheckSize: {x: 0.1, y: 0.5}
+  _frontBlockCheckSize: {x: 0.1, y: 0.35}
   _headBlockCheckPoint: {fileID: 1338674168}
-  _headBlockCheckSize: {x: 1.2, y: 0.1}
+  _headBlockCheckSize: {x: 1.1, y: 0.1}
   _frontBlockHitCheckPoint: {fileID: 622400611}
   _frontBlockHitCheckPointLen: 0.12
   _frontHitRays: 5
-  _frontHitVerticalSpan: 0.5
+  _frontHitVerticalSpan: 0.35
   _probeCenterTransform: {fileID: 432170519}
   _probeBehindTransform: {fileID: 138280789}
   _probeFrontTransform: {fileID: 43572941}
@@ -542,7 +546,7 @@ Transform:
   m_GameObject: {fileID: 432170518}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.1, y: -0.35, z: 0}
+  m_LocalPosition: {x: 0, y: -0.35, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

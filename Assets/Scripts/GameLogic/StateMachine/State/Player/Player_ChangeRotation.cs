@@ -19,9 +19,12 @@ public class Player_ChangeRotation : PlayerState
     public override void Update()
     {
         base.Update();
-        
-        if (isRotate && player.hasHitPos) 
+
+        if (isRotate)
+        {
             HandlePlayerRotation();
+            HandleContinuousMove();
+        }
         else
             player.stateMachine.ChangeState(player.wallMoveState);
 
@@ -41,6 +44,41 @@ public class Player_ChangeRotation : PlayerState
         player.isRightRotate = false;
         player.hasHitPos = false;
         player.blockHitPos = new Vector2(0f, 0f);
+    }
+    
+    private void HandleContinuousMove()
+    {
+        switch (player.playerRot)
+        {
+            case 1:
+                if (player.lastRot == 4 && player.isMove && player.isFacingRight) 
+                {
+                    player.continuousMoveDir = -1;
+                    player.isContinuousMove = true;
+                }
+                break;
+            case 2:
+                break;
+            case 3:
+                if (player.lastRot == 4 && player.isMove && !player.isFacingRight) 
+                {
+                    player.continuousMoveDir = 1;
+                    player.isContinuousMove = true;
+                }
+                break;
+            case 4:
+                if (player.lastRot == 3 && player.isMove && !player.isFacingRight) 
+                {
+                    player.continuousMoveDir = 1;
+                    player.isContinuousMove = true;
+                }
+                else if (player.lastRot == 1 && player.isMove && player.isFacingRight)
+                {
+                    player.continuousMoveDir = -1;
+                    player.isContinuousMove = true;
+                }
+                break;
+        }
     }
     
     private void HandlePlayerRotation()
