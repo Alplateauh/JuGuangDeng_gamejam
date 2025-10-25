@@ -40,14 +40,14 @@ public class Player_JumpState : PlayerState
         {
             player.SetPlayerGravityScale(movementData.gravityScale);
         }
-
-        if (player.isWallMove) 
-            player.stateMachine.ChangeState(player.wallMoveState);
         
         if (player.rb.velocity.y < 0)
         {
             player.stateMachine.ChangeState(player.fallState);
         }
+
+        if (player.isWallMove) 
+            player.stateMachine.ChangeState(player.wallMoveState);
     }
     
     public override void FixedUpdate()

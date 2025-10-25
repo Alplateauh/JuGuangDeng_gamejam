@@ -20,24 +20,27 @@ public class Player_WallLeaveState : PlayerState
     {
         base.Update();
 
-        if (player.hitSide == 1)
+        if (player.playerRot == 1)
         {
             player.transform.position = new Vector3(player.transform.position.x - player.playerLength / 2,
                 player.transform.position.y, player.transform.position.z);
             player.transform.rotation = Quaternion.Euler(0, 0, 0);
-            player.stateMachine.ChangeState(player.fallState);
+            stateMachine.ChangeState(player.fallState);
         }
-        else if (player.hitSide == 3)
+        else if (player.playerRot == 3)
         {
             player.transform.position = new Vector3(player.transform.position.x + player.playerLength / 2,
                 player.transform.position.y, player.transform.position.z);
             player.transform.rotation = Quaternion.Euler(0, 0, 0);
-            player.stateMachine.ChangeState(player.fallState);
+            stateMachine.ChangeState(player.fallState);
         }
-        else if (player.hitSide == 4)
+        else if (player.playerRot == 4)
         {
-            player.stateMachine.ChangeState(player.fallState);
+            stateMachine.ChangeState(player.fallState);
         }
+
+        if (!player.isGround) 
+            stateMachine.ChangeState(player.fallState);
     }
 
     public override void FixedUpdate()

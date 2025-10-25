@@ -43,11 +43,7 @@ public class Player_InputHandle : MonoBehaviour
         else
             player.faceDir = input.x > 0 ? 1 : input.x < 0 ? -1 : 0;
         
-        // 状态切换
-        if (player.stateMachine.currentState == player.idleState && player.faceDir != 0)
-        {
-            player.stateMachine.ChangeState(player.moveState);
-        }
+        player.isMove = true;
     }
     
     private void OnJumpInput()
@@ -74,7 +70,10 @@ public class Player_InputHandle : MonoBehaviour
         else if (Input.GetKey(KeyCode.D) && Input.GetAxis("Horizontal") < 0)
             player.faceDir = 1;
         else
+        {
             player.faceDir = 0;
+            player.isMove = false;
+        }
     }
 
     private void OnDestroy()
