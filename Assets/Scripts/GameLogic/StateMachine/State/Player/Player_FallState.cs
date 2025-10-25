@@ -15,6 +15,7 @@ public class Player_FallState : PlayerState
     {
         base.Enter();
         
+        player.SetPlayerGravityScale(movementData.gravityScale);
         player.transform.rotation = Quaternion.Euler(0, 0, 0);
         player.transform.localScale = new Vector3(player.transform.localScale.x, 1, player.transform.localScale.z);
     }
@@ -35,14 +36,11 @@ public class Player_FallState : PlayerState
         player.rb.velocity = new Vector2(player.rb.velocity.x,
             Mathf.Max(player.rb.velocity.y, -movementData.maxFallSpeed * 1f / Time.timeScale));
         
-        if (player.isGround) 
-            player.stateMachine.ChangeState(player.moveState);
-        
         if (player.isJumping)
             stateMachine.ChangeState(player.jumpState);
 
         if (player.isWallMove) 
-            stateMachine.ChangeState(player.wallMoveState);
+            player.stateMachine.ChangeState(player.wallMoveState);
     }
     
     public override void FixedUpdate()

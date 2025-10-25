@@ -14,7 +14,6 @@ public class Player_MoveState : PlayerState
     {
         base.Enter();
         player.isJumping = false;
-        player.hasChanged = false;
     }
 
     public override void Update()
@@ -27,7 +26,7 @@ public class Player_MoveState : PlayerState
         if (player.canJump && player.isJumping) 
             stateMachine.ChangeState(player.jumpState);
 
-        if (player.isWallMove) 
+        if (player.isHitBlock && player.playerRot != 2)  
             stateMachine.ChangeState(player.wallMoveState);
 
         if (!player.isGround) 
