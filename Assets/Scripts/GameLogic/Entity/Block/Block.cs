@@ -6,7 +6,7 @@ using UnityEngine;
 public class Block : MonoBehaviour
 {
     private Collider2D collider;
-    private Player player;
+    //private Player player;
     
     public BlockType blockType;
     public Vector2 checkArea;
