@@ -18,7 +18,7 @@ public class Check : MonoBehaviour
     [SerializeField] private Transform _frontBlockCheckPoint;
     [SerializeField] private Vector2 _frontBlockCheckSize;
     [SerializeField] private Transform _headBlockCheckPoint;
-    [SerializeField] private Vector2 _headBlockCheckSize;
+    [FormerlySerializedAs("_headtBlockCheckSize")] [SerializeField] private Vector2 _headBlockCheckSize;
     
     [Header("BlockHit射线设置")]
     [SerializeField] private Transform _frontBlockHitCheckPoint; 

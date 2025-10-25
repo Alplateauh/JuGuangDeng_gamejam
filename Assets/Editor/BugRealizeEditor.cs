@@ -13,6 +13,7 @@ public class BugRealizeEditor : Editor
     private SerializedProperty ColorCount;
     private SerializedProperty ColorSChange;
     private SerializedProperty EndPosition;
+    private SerializedProperty RayScale;
 
     private void OnEnable()
     {
@@ -25,6 +26,7 @@ public class BugRealizeEditor : Editor
         ColorCount = serializedObject.FindProperty("ColorCount");
         ColorSChange = serializedObject.FindProperty("ColorSChange");
         EndPosition = serializedObject.FindProperty("EndPosition");
+        RayScale = serializedObject.FindProperty("RayScale");
     }
 
     public override void OnInspectorGUI()
@@ -49,6 +51,7 @@ public class BugRealizeEditor : Editor
         EditorGUILayout.PropertyField(playerLayer);
         EditorGUILayout.PropertyField(rayCount);
         EditorGUILayout.PropertyField(AnimTime);
+        EditorGUILayout.PropertyField(RayScale);
         
         serializedObject.ApplyModifiedProperties();
     }

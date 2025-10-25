@@ -12,6 +12,9 @@ public class Block : MonoBehaviour
     public Vector2 checkArea;
     public LayerMask playerLayerMask;
     private Vector2[] cornerPos;
+    
+    
+    public Player player;
 
     private void Start()
     {
