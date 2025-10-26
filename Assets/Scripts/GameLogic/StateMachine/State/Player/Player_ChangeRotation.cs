@@ -90,7 +90,7 @@ public class Player_ChangeRotation : PlayerState
                 case 1:
                     player.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
                     player.transform.position = new Vector3(player.blockHitPos.x - player.playerHeight / 2,
-                        player.blockHitPos.y + player.player / 2, 0);
+                        player.blockHitPos.y + player.playerLength / 2, 0);
                     isRotate = false;
                     break;
                 case 2:

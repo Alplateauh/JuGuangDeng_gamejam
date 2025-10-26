@@ -32,6 +32,12 @@ public class Player_IdleState : PlayerState
         if (player.canJump && player.isJumping && player.playerRot == 2)   
             stateMachine.ChangeState(player.jumpState);
 
+        if (player.canJump && player.isWallJumping && player.isHitBlock)
+            stateMachine.ChangeState(player.wallJumpState);
+
+        if (!player.canJump && player.isLeaving && player.isHitBlock) 
+            stateMachine.ChangeState(player.wallLeaveState);
+
         if (!player.isGround && !player.isWallMove)
             stateMachine.ChangeState(player.fallState);
         
