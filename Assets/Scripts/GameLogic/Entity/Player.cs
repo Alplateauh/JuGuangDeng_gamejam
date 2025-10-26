@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
 {
-    #region å¼•ç”¨
+    #region ÒıÓÃ
 
     public Animator animator { get; private set; }
     public Rigidbody2D rb { get; private set; }
@@ -16,28 +16,30 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    [Header("ç©å®¶æ•°æ®")]
+    [Header("Íæ¼ÒÊı¾İ")]
     public PlayerMovementData movementData;
-    [ReadOnly] public bool isGround = false;
+    public float playerHeight;
+    public float playerLength;
+    public bool isGround = false;
 
-    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½")]
+    [Header("Á¬ĞøÒÆ¶¯Ïà¹Ø")]
     public bool isMove = false;
-    public bool isContinuousMove = false; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½×´Ì¬
-    public int continuousMoveDir = 0; // ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
+    public bool isContinuousMove = false; // ÊÇ·ñ´¦ÓÚÁ¬ĞøÒÆ¶¯×´Ì¬
+    public int continuousMoveDir = 0; // Á¬ĞøÒÆ¶¯µÄ·½Ïò
         
-    #region ï¿½Ø¿ï¿½ï¿½ï¿½ï¿½
+    #region µØ¿éÏà¹Ø
 
-    [Header("ï¿½Ø¿ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½")]
+    [Header("µØ¿éÏà¹Ø²ÎÊı")]
     public Transform rotatePos;
     public Vector2 blockHitPos;
     public Vector2 lastEdgePos;
     public bool hasHitPos;
     public bool hasEdgePos;
-    public int lastRot; // ï¿½ï¿½ï¿½ï¿½ï¿½Blockï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½
-    public bool isHitBlock = false; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Block
-    public bool isFirstHit = false; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Block
-    public bool isWallMove = false; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Blockï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½×´Ì¬
-    public int playerRot; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²ï¿½ï¿½ï¿½ï¿½Blockï¿½ßµï¿½ï¿½ï¿½×ª×´Ì¬ï¿½ï¿½0-ï¿½Ş£ï¿½1-Í·ï¿½ï¿½ï¿½ï¿½à£¬2-ï¿½Ï²à£¬3-ï¿½Ò²à£¬4-ï¿½Â²ï¿½
+    public int lastRot; // Íæ¼ÒÔÚBlockµÄÉÏÒ»Ìõ±ß
+    public bool isHitBlock = false; // ÊÇ·ñÅöµ½Block
+    public bool isFirstHit = false; // ÊÇ·ñÅöµ½Block
+    public bool isWallMove = false; // ÊÇ·ñ½øÈëBlockÉÏÒÆ¶¯µÄ×´Ì¬
+    public int playerRot; // ´ú±íÍæ¼ÒÅö×²µ½µÄBlock±ßµÄĞı×ª×´Ì¬¡£0-ÎŞ£¬1-Í·³¯×ó²à£¬2-ÉÏ²à£¬3-ÓÒ²à£¬4-ÏÂ²à
     public bool isLeftRotate = false;
     public bool isRightRotate = false;
     public bool isLeftChange = false;
@@ -46,18 +48,18 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region è½¬èº«ç›¸å…³å‚æ•°
+    #region ×ªÉíÏà¹Ø²ÎÊı
 
-    [Header("×ªï¿½ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½")]
+    [Header("×ªÉíÏà¹Ø²ÎÊı")]
     public int faceDir;
     [HideInInspector] public bool canFlip;
-    public bool isFacingRight { get; private set; } // è¡¨ç¤ºç©å®¶å½“å‰æ˜¯å¦é¢å‘å³ä¾§
+    public bool isFacingRight { get; private set; } // ±íÊ¾Íæ¼Òµ±Ç°ÊÇ·ñÃæÏòÓÒ²à
 
     #endregion
 
-    #region è·³è·ƒç›¸å…³å‚æ•°
+    #region ÌøÔ¾Ïà¹Ø²ÎÊı
 
-    [Header("è·³è·ƒç›¸å…³å‚æ•°")]
+    [Header("ÌøÔ¾Ïà¹Ø²ÎÊı")]
     public bool canJump;
     public bool isJumping;
     public bool isJumpCut;
@@ -66,37 +68,37 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region è¾“å…¥çª—å£
+    #region ÊäÈë´°¿Ú
 
-    // å½“å˜é‡ä¸ºfalseï¼Œåœ¨InputHandleä¸­å±è”½è¾“å…¥
+    // µ±±äÁ¿Îªfalse£¬ÔÚInputHandleÖĞÆÁ±ÎÊäÈë
     public bool jumpInputWindow { get; private set; }
 
     #endregion
 
-    #region çŠ¶æ€æœº
+    #region ×´Ì¬»ú
 
     public PlayerFSM stateMachine { get; private set; }
-    // ç©å®¶ç©ºé—²çŠ¶æ€
+    // Íæ¼Ò¿ÕÏĞ×´Ì¬
     public Player_IdleState idleState { get; private set; }
-    // ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½×´Ì¬
+    // Íæ¼ÒÒÆ¶¯×´Ì¬
     //public Player_MoveState moveState { get; private set; }
-    // ï¿½ï¿½ï¿½ï¿½ï¿½Ô¾×´Ì¬
+    // Íæ¼ÒÌøÔ¾×´Ì¬
     public Player_JumpState jumpState { get; private set; }
-    // ç©å®¶ä¸‹è½çŠ¶æ€
+    // Íæ¼ÒÏÂÂä×´Ì¬
     public Player_FallState fallState { get; private set; }
-    // ç©å®¶åœ¨å¢™å£ç§»åŠ¨ä¸Šçš„çŠ¶æ€
+    // Íæ¼ÒÔÚÇ½±ÚÒÆ¶¯ÉÏµÄ×´Ì¬
     public Player_WallMoveState wallMoveState { get; private set; }
-    // ï¿½ï¿½ï¿½ï¿½ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¾/ï¿½ë¿ªï¿½ï¿½×´Ì¬
+    // Íæ¼ÒÔÚÇ½±ÚÉÏÌøÔ¾/Àë¿ªµÄ×´Ì¬
     public Player_WallJumpState wallJumpState { get; private set; }
-    // ï¿½ï¿½ï¿½ï¿½ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ë¿ªï¿½ï¿½×´Ì¬
+    // Íæ¼ÒÔÚÇ½±ÚÉÏÀë¿ªµÄ×´Ì¬
     public Player_WallLeaveState wallLeaveState { get; private set; }
-    // ï¿½ï¿½ï¿½×ªï¿½ï¿½Blockï¿½Ä±ßµï¿½×´Ì¬
+    // Íæ¼Ò×ªÒÆBlockµÄ±ßµÄ×´Ì¬
     public Player_ChangeRotation changeRotationState { get; private set; }
     public Player_ChangeSideState changeSideState { get; private set; }
 
     #endregion
 
-    #region è®¡æ—¶å™¨
+    #region ¼ÆÊ±Æ÷
 
     private Dictionary<TimerType, float> timers = new Dictionary<TimerType, float>()
     {
@@ -114,7 +116,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        // åˆå§‹åŒ–çŠ¶æ€æœºçŠ¶æ€
+        // ³õÊ¼»¯×´Ì¬»ú×´Ì¬
         stateMachine = new PlayerFSM();
         idleState = new Player_IdleState(this, stateMachine, "Idle");
         //moveState = new Player_MoveState(this, stateMachine, "Move");
@@ -129,19 +131,19 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        // è®¾ç½®å¼•ç”¨
+        // ÉèÖÃÒıÓÃ
         animator = GetComponentInChildren<Animator>();
         collider = GetComponent<Collider2D>();
         rb = GetComponent<Rigidbody2D>();
         check = GetComponent<Check>();
 
-        // åˆå§‹åŒ–çŠ¶æ€æœº
+        // ³õÊ¼»¯×´Ì¬»ú
         stateMachine.Init(idleState);
         keys = new List<TimerType>(timers.Keys);
         jumpInputWindow = true;
         faceDir = 0;
 
-        // è®¾ç½®åˆå§‹é‡åŠ›ä¸æœå‘
+        // ÉèÖÃ³õÊ¼ÖØÁ¦Óë³¯Ïò
         SetPlayerGravityScale(movementData.gravityScale);
         isFacingRight = true;
         canFlip = true;
@@ -151,9 +153,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        // æ›´æ–°å½“å‰çŠ¶æ€
+        // ¸üĞÂµ±Ç°×´Ì¬
         stateMachine.currentState.Update();
-        // æ›´æ–°åœ°é¢æ£€æµ‹æ—¶é—´
+        // ¸üĞÂµØÃæ¼ì²âÊ±¼ä
         isGround = check.IsOnGround(); 
         
         UpdateTimers();
@@ -162,7 +164,7 @@ public class Player : MonoBehaviour
         HandleWallJumpInput();
         HandlePlayerLeaving();
         
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°×´Ì¬
+        // µ÷ÊÔÈÕÖ¾£¬Êä³öµ±Ç°×´Ì¬
         Debug.Log(stateMachine.currentState);
         // Debug.Log(isFacingRight);
         //Debug.Log(GetTimer(TimerType.LeaveBlockCoolDown));
@@ -173,26 +175,16 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // å›ºå®šæ—¶é—´æ›´æ–°å½“å‰çŠ¶æ€
+        // ¹Ì¶¨Ê±¼ä¸üĞÂµ±Ç°×´Ì¬
         stateMachine.currentState.FixedUpdate();
     }
 
-    // æ£€æµ‹Playeræ˜¯å¦ç¢°æ’åˆ°Block
-    // private void OnCollisionEnter2D(Collision2D blockColl)
-    // {
-    //     if ((1 << blockColl.gameObject.layer & blockLayerMask) != 0 && hitBlock == false) 
-    //     {
-    //         hitBlock = true;
-    //         block = blockColl.gameObject.GetComponent<Block>();
-    //     }
-    // }
-
-    #region å¸¸ç”¨æ–¹æ³•
+    #region ³£ÓÃ·½·¨
 
     /// <summary>
-    /// è®¾ç½®ç©å®¶çš„é‡åŠ›
+    /// ÉèÖÃÍæ¼ÒµÄÖØÁ¦
     /// </summary>
-    /// <param name="gravityScale">é‡åŠ›</param>
+    /// <param name="gravityScale">ÖØÁ¦</param>
     public void SetPlayerGravityScale(float gravityScale)
     {
         if (TimeMgr.GetInstance().IsStop()) rb.gravityScale = gravityScale / Time.timeScale / Time.timeScale;
@@ -200,7 +192,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// æ‰“å¼€æˆ–è€…å…³é—­è·³è·ƒè¾“å…¥çª—å£
+    /// ´ò¿ª»òÕß¹Ø±ÕÌøÔ¾ÊäÈë´°¿Ú
     /// </summary>
     /// <param name="isOpen"></param>
     public void OpenOrCloseJumpInputWindow(bool isOpen)
@@ -209,7 +201,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// ç»Ÿä¸€çš„è®¡æ—¶å™¨æ›´æ–°æ–¹æ³•
+    /// Í³Ò»µÄ¼ÆÊ±Æ÷¸üĞÂ·½·¨
     /// </summary>
     private void UpdateTimers()
     {
@@ -229,7 +221,7 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    #region æ£€æµ‹æ–¹æ³•
+    #region ¼ì²â·½·¨
 
     private void HFlip()
     {
@@ -266,21 +258,21 @@ public class Player : MonoBehaviour
     
     #endregion
 
-    #region ç§»åŠ¨æ–¹æ³•
+    #region ÒÆ¶¯·½·¨
 
     public void Run(float lerpAmount)
     {
-        // ä½¿ç”¨é»˜è®¤çš„æœ€å¤§é€Ÿåº¦
+        // Ê¹ÓÃÄ¬ÈÏµÄ×î´óËÙ¶È
         Run(lerpAmount, movementData.runMaxSpeed);
     }
 
     private void Run(float lerpAmount, float runMaxSpeed)
     {
-        // è·å–å½“å‰ç§»åŠ¨æ–¹å‘ï¼ˆè€ƒè™‘æ—‹è½¬ï¼‰
+        // »ñÈ¡µ±Ç°ÒÆ¶¯·½Ïò
         Vector2 moveDirection = GetCurrentMoveDirection();
 
         float targetSpeed;
-        // ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Ù¶ï¿½
+        // ¼ÆËãÄ¿±êËÙ¶È
         if (isContinuousMove) 
             targetSpeed = continuousMoveDir * runMaxSpeed;
         else
@@ -288,10 +280,10 @@ public class Player : MonoBehaviour
         
         targetSpeed = Mathf.Lerp(GetVelocityInMoveDirection(moveDirection), targetSpeed, lerpAmount);
 
-        // æ ¹æ®ç›®æ ‡é€Ÿåº¦è®¡ç®—åŠ é€Ÿç‡
+        // ¸ù¾İÄ¿±êËÙ¶È¼ÆËã¼ÓËÙÂÊ
         float accelRate = CalculateAccelRate(targetSpeed);
 
-        // è·³è·ƒé¡¶ç‚¹æ—¶çš„ç‰¹æ®Šå¤„ç†
+        // ÌøÔ¾¶¥µãÊ±µÄÌØÊâ´¦Àí
         if ((isJumping || stateMachine.currentState == fallState) &&
             Mathf.Abs(rb.velocity.y) < movementData.jumpHangTimeThreshold)
         {
@@ -299,57 +291,56 @@ public class Player : MonoBehaviour
             targetSpeed *= movementData.jumpHangMaxSpeedMult;
         }
 
-        // å¦‚æœç¬¦åˆä¿æŒåŠ¨é‡çš„æ¡ä»¶ï¼Œåˆ™ä¸è¿›è¡ŒåŠ é€Ÿ
+        // Èç¹û·ûºÏ±£³Ö¶¯Á¿µÄÌõ¼ş£¬Ôò²»½øĞĞ¼ÓËÙ
         if (ShouldMaintainMomentum(targetSpeed, moveDirection))
         {
             accelRate = 0;
         }
 
-        // è®¡ç®—å½“å‰é€Ÿåº¦åœ¨ç§»åŠ¨æ–¹å‘ä¸Šçš„åˆ†é‡
+        // ¼ÆËãµ±Ç°ËÙ¶ÈÔÚÒÆ¶¯·½ÏòÉÏµÄ·ÖÁ¿
         float currentVelInMoveDir = GetVelocityInMoveDirection(moveDirection);
         float movement = (targetSpeed - currentVelInMoveDir) * accelRate;
 
-        // æ²¿æ­£ç¡®çš„æ–¹å‘æ–½åŠ åŠ›
+        // ÑØÕıÈ·µÄ·½ÏòÊ©¼ÓÁ¦
         rb.AddForce(movement * moveDirection, ForceMode2D.Force);
     }
 
     /// <summary>
-    /// è·å–å½“å‰ç§»åŠ¨æ–¹å‘ï¼ˆè€ƒè™‘è§’è‰²æ—‹è½¬ï¼‰
+    /// »ñÈ¡µ±Ç°ÒÆ¶¯·½Ïò£¨¿¼ÂÇ½ÇÉ«Ğı×ª£©
     /// </summary>
     private Vector2 GetCurrentMoveDirection()
     {
-        // æ ¹æ®è§’è‰²æ—‹è½¬è§’åº¦ç¡®å®šç§»åŠ¨æ–¹å‘
+        // ¸ù¾İ½ÇÉ«Ğı×ª½Ç¶ÈÈ·¶¨ÒÆ¶¯·½Ïò
         float currentRotation = transform.eulerAngles.z;
     
-        // ï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶È±ï¿½×¼ï¿½ï¿½ï¿½ï¿½0-360ï¿½ï¿½
+        // ½«Ğı×ª½Ç¶È±ê×¼»¯µ½0-360¶È
         float normalizedRotation = (currentRotation % 360 + 360) % 360;
     
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½Ç¶È·ï¿½ï¿½Ø¶ï¿½Ó¦ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ¸ù¾İĞı×ª½Ç¶È·µ»Ø¶ÔÓ¦µÄÒÆ¶¯·½Ïò
         if (normalizedRotation >= 315 || normalizedRotation < 45)
         {
-            // 0åº¦æ–¹å‘ - å‘å³ç§»åŠ¨
-            return Vector2.right;
+            return Vector2.right; // 0¶È·½Ïò - ÏòÓÒÒÆ¶¯
         }
         else if (normalizedRotation >= 45 && normalizedRotation < 135)
         {
-            // 90åº¦æ–¹å‘ - å‘ä¸Šç§»åŠ¨
+            // 90¶È·½Ïò - ÏòÉÏÒÆ¶¯
             return Vector2.up;
         }
         else if (normalizedRotation >= 135 && normalizedRotation < 225)
         {
-            // Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò¿ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½Ä½Ç¶ï¿½ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-            // 180ï¿½È·ï¿½ï¿½ï¿½ - ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
+            // Êµ¼ÊÉÏÒÔÍæ¼Ò¿ÉÒÔĞı×ªµÄ½Ç¶ÈÊÇ½ø²»À´ÕâÀïµÄ£¬´¿´âÎªÁË¶ÓĞÎÕûÆë
+            // 180¶È·½Ïò - Ïò×óÒÆ¶¯
             return Vector2.left;
         }
-        else // 225-315åº¦
+        else // 225-315¶È
         {
-            // 270åº¦æ–¹å‘ - å‘ä¸‹ç§»åŠ¨
+            // 270¶È·½Ïò - ÏòÏÂÒÆ¶¯
             return Vector2.down;
         }
     }
-
+    
     /// <summary>
-    /// è·å–å½“å‰é€Ÿåº¦åœ¨æŒ‡å®šæ–¹å‘ä¸Šçš„åˆ†é‡
+    /// »ñÈ¡µ±Ç°ËÙ¶ÈÔÚÖ¸¶¨·½ÏòÉÏµÄ·ÖÁ¿
     /// </summary>
     private float GetVelocityInMoveDirection(Vector2 moveDirection)
     {
@@ -357,7 +348,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// æ ¹æ®ç›®æ ‡é€Ÿåº¦å’Œç©å®¶çŠ¶æ€è®¡ç®—åŠ é€Ÿåº¦
+    /// ¸ù¾İÄ¿±êËÙ¶ÈºÍÍæ¼Ò×´Ì¬¼ÆËã¼ÓËÙ¶È
     /// </summary>
     private float CalculateAccelRate(float targetSpeed)
     {
@@ -374,7 +365,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// åˆ¤æ–­æ˜¯å¦åº”è¯¥ä¿æŒåŠ¨é‡
+    /// ÅĞ¶ÏÊÇ·ñÓ¦¸Ã±£³Ö¶¯Á¿
     /// </summary>
     private bool ShouldMaintainMomentum(float targetSpeed, Vector2 moveDirection)
     {
@@ -385,13 +376,15 @@ public class Player : MonoBehaviour
                Mathf.Abs(targetSpeed) > 0.01f &&
                GetTimer(TimerType.LastOnGround) < 0;
     }
-
+    
+    
+    
     #endregion
 
-    #region è·³è·ƒæ–¹æ³•
+    #region ÌøÔ¾·½·¨
 
     /// <summary>
-    /// å¤„ç†ç©å®¶è·³è·ƒ
+    /// ´¦ÀíÍæ¼ÒÌøÔ¾
     /// </summary>
     private void HandleJumpInput()
     {
@@ -404,11 +397,11 @@ public class Player : MonoBehaviour
             OpenOrCloseJumpInputWindow(true);
         }
         
-        // å¦‚æœæ²¡æœ‰è·³è·ƒè¾“å…¥ï¼Œåˆ™ç›´æ¥è¿”å›
+        // Èç¹ûÃ»ÓĞÌøÔ¾ÊäÈë£¬ÔòÖ±½Ó·µ»Ø
         if (GetTimer(TimerType.LastPressJump) <= 0)
             return;
         
-        // æ™®é€šè·³è·ƒé€»è¾‘ï¼ˆåœ¨åœ°é¢ä¸”æœªè·³è·ƒï¼‰
+        // ÆÕÍ¨ÌøÔ¾Âß¼­£¨ÔÚµØÃæÇÒÎ´ÌøÔ¾£©
         if (CanJump())
         {
             isJumping = true;
@@ -418,9 +411,9 @@ public class Player : MonoBehaviour
     }
     
     /// <summary>
-    /// åˆ¤æ–­ç©å®¶æ­¤æ—¶æ˜¯å¦å¯ä»¥è·³è·ƒ
+    /// ÅĞ¶ÏÍæ¼Ò´ËÊ±ÊÇ·ñ¿ÉÒÔÌøÔ¾
     /// </summary>
-    /// <returns>å¦‚æœç©å®¶åœ¨åœ°é¢ï¼Œåœ¨åœŸç‹¼æ—¶é—´å†…ï¼Œå¯ä»¥è·³è·ƒ</returns>
+    /// <returns>Èç¹ûÍæ¼ÒÔÚµØÃæ£¬ÔÚÍÁÀÇÊ±¼äÄÚ£¬¿ÉÒÔÌøÔ¾</returns>
     private bool CanJump()
     {
         return GetTimer(TimerType.LastOnGround) > 0 && !isJumping && canJump && (!isHitBlock || playerRot == 2);
@@ -441,17 +434,16 @@ public class Player : MonoBehaviour
     {
         return canJump && isHitBlock && playerRot != 2;
     }
-
+    
     #endregion
 
-
-    #region ï¿½Ø¿é·½ï¿½ï¿½
+    #region µØ¿é·½·¨
     
     /// <summary>
-    /// ç”¨æ¥åšè§’è‰²çš„æ—‹è½¬
+    /// ÓÃÀ´×ö½ÇÉ«µÄĞı×ª
     /// </summary>
-    /// <param name="number">0,1,2,3åˆ†åˆ«ä»£è¡¨ç©å®¶ç¢°æ’Blockå“ªä¸€ä¾§åº”è¯¥å¯¹åº”çš„æ—‹è½¬è§’åº¦ã€‚
-    /// 0-æ—  1-å·¦ä¾§-90Â°ï¼Œ2-ä¸Šä¾§-0Â°ï¼Œ3-å³ä¾§- -90åº¦ï¼Œ4-ä¸‹ä¾§-180Â°</param>
+    /// <param name="number">0,1,2,3·Ö±ğ´ú±íÍæ¼ÒÅö×²BlockÄÄÒ»²àÓ¦¸Ã¶ÔÓ¦µÄĞı×ª½Ç¶È¡£
+    /// 0-ÎŞ 1-×ó²à-90¡ã£¬2-ÉÏ²à-0¡ã£¬3-ÓÒ²à- -90¶È£¬4-ÏÂ²à-180¡ã</param>
     public void PlayerRotate(int number)
     {
         if (rotatePos == null)
@@ -465,27 +457,27 @@ public class Player : MonoBehaviour
             return;
         }
         
-        // ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Ç¶ï¿½
+        // ¼ÆËãÄ¿±ê½Ç¶È
         float targetAngle = 0f;
         switch (number)
         {
-            case 1: targetAngle = 90f; break;    // ï¿½ï¿½ï¿½
-            case 2: targetAngle = 0f; break;     // ï¿½Ï²ï¿½
-            case 3: targetAngle = -90f; break;   // ï¿½Ò²ï¿½
+            case 1: targetAngle = 90f; break;    // ×ó²à
+            case 2: targetAngle = 0f; break;     // ÉÏ²à
+            case 3: targetAngle = -90f; break;   // ÓÒ²à
             default: targetAngle = 0f; break;
         }
 
-        // å¦‚æœè§’åº¦æ²¡æœ‰å˜åŒ–ï¼Œç›´æ¥è¿”å›
+        // Èç¹û½Ç¶ÈÃ»ÓĞ±ä»¯£¬Ö±½Ó·µ»Ø
         if (Mathf.Approximately(transform.eulerAngles.z, targetAngle))
             return;
 
-        // è®¡ç®—å½“å‰è§’åº¦ä¸ç›®æ ‡è§’åº¦çš„å·®å€¼
+        // ¼ÆËãµ±Ç°½Ç¶ÈÓëÄ¿±ê½Ç¶ÈµÄ²îÖµ
         float currentAngle = transform.eulerAngles.z;
         float angleDif = targetAngle - currentAngle;
         while (angleDif > 180) angleDif -= 360;
         while (angleDif < -180) angleDif += 360;
 
-        // ä½¿ç”¨RotateAroundå›´ç»•rotatePosæ—‹è½¬
+        // Ê¹ÓÃRotateAroundÎ§ÈÆrotatePosĞı×ª
         transform.RotateAround(rotatePos.position, Vector3.forward, angleDif);
     }
 
@@ -494,7 +486,7 @@ public class Player : MonoBehaviour
         Collider2D playerCollider = collider; 
         if (playerCollider == null) return;
 
-        // ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½Äµï¿½ï¿½ï¿½ collidersï¿½ï¿½ï¿½ï¿½ bounds ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½É¸Ñ¡ï¿½ï¿½
+        // ÕÒµ½¿ÉÄÜÖØµşµÄµØĞÎ colliders£¨ÓÃ bounds À©ÕÅÒ»µã×÷É¸Ñ¡£©
         Bounds b = playerCollider.bounds;
         Vector2 center = b.center;
         Vector2 size = b.size + Vector3.one * 0.02f; // small padding
@@ -507,15 +499,15 @@ public class Player : MonoBehaviour
         {
             if (other == playerCollider) continue;
 
-            // ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ ColliderDistance2D
+            // ¸ü¾«È·µØÓÃ ColliderDistance2D
             ColliderDistance2D dist = playerCollider.Distance(other);
             if (dist.isOverlapped)
             {
-                // dist.normal Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ other ï¿½Ä·ï¿½ï¿½ë·½ï¿½ï¿½
-                float penetration = -dist.distance; // distance ï¿½Ç¸ï¿½Öµï¿½ï¿½Ê¾ï¿½Øµï¿½ï¿½ï¿½ï¿½
+                // dist.normal Ö¸ÏòÍæ¼ÒÏà¶ÔÓÚ other µÄ·ÖÀë·½Ïò
+                float penetration = -dist.distance; // distance ÊÇ¸ºÖµ±íÊ¾ÖØµşÉî¶È
                 Vector2 nudge = dist.normal * penetration;
 
-                // ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½âµ¯ï¿½ï¿½ï¿½ï¿½Ô¶
+                // ÏŞÖÆÃ¿´ÎÍÆÀëÁ¿£¬±ÜÃâµ¯³ö¹ıÔ¶
                 float maxNudge = 0.5f;
                 if (nudge.magnitude > maxNudge) nudge = nudge.normalized * maxNudge;
 
