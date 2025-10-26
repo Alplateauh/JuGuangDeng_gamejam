@@ -35,24 +35,20 @@ public class PluginManager : MonoBehaviour
     /// <param name="interactionType">要激活的插件的类型。</param>
     public void AddPlugin(InteractionType interactionType)
     {
-        // 1. 检查插件是否已在激活列表中
         if (pickedPlugins.Any(p => p.pluginData.interactionType == interactionType))
         {
-            Debug.LogWarning($"试图重复激活插件: {interactionType}。操作忽略。");
+            Debug.LogWarning($"试图重复拾取插件: {interactionType}。操作忽略。");
             return;
         }
 
-        // 2. 从对象池中找到要激活的插件实例
         if (pluginPool.TryGetValue(interactionType, out BasePlugin pluginToActivate))
         {
-            // 3. 将其添加到激活列表中进行追踪
             pickedPlugins.Add(pluginToActivate);
-            pluginToActivate.SetPlayer(player);
-            Debug.Log($"插件 '{pluginToActivate.pluginData.pluginName}' 已被添加到激活列表。");
+            Debug.Log($"插件 '{pluginToActivate.pluginData.pluginName}' 已被拾取。");
         }
         else
         {
-            Debug.LogError($"在插件池中找不到类型为 {interactionType} 的插件！无法激活。");
+            Debug.LogError($"在插件池中找不到类型为 {interactionType} 的插件！无法拾取。");
         }
     }
 
@@ -123,18 +119,6 @@ public class PluginManager : MonoBehaviour
         }
     }
 
-    public void AddActivePlugin(BasePlugin plugin)
-    {
-        if (pickedPlugins.Contains(plugin))
-        {
-            activePlugins.Add(plugin);
-        }
-        else
-        {
-            Debug.LogError("试图装备未拾取插件");
-        }
-    }
-    
     public void ExchangePlugin(BasePlugin plugin1, BasePlugin plugin2)
     {
         if (!pickedPlugins.Contains(plugin1) || !pickedPlugins.Contains(plugin2))
@@ -153,12 +137,16 @@ public class PluginManager : MonoBehaviour
                 int index = activePlugins.IndexOf(plugin1);
                 activePlugins[index] = plugin2;
                 Debug.Log($"插件 '{plugin1.pluginData.pluginName}' 已被替换为 '{plugin2.pluginData.pluginName}'。");
+                plugin1.SetPlayer(null);
+                plugin2.SetPlayer(player);
             }
             else
             {
                 int index = activePlugins.IndexOf(plugin2);
                 activePlugins[index] = plugin1;
                 Debug.Log($"插件 '{plugin2.pluginData.pluginName}' 已被替换为 '{plugin1.pluginData.pluginName}'。");
+                plugin2.SetPlayer(null);
+                plugin1.SetPlayer(player);
             }
         }
         else if (isPlugin1Active && isPlugin2Active)
@@ -184,8 +172,27 @@ public class PluginManager : MonoBehaviour
             Debug.Log($"未激活插件 '{plugin1.pluginData.pluginName}' 和 '{plugin2.pluginData.pluginName}' 交换了它们的位置。");
         }
     }
+
+    public void ActivePlugin(BasePlugin plugin)
+    {
+        if (pickedPlugins.Contains(plugin)&&!activePlugins.Contains(plugin))
+        {
+            activePlugins.Add(plugin);
+            plugin.SetPlayer(player);
+            Debug.Log($"激活未激活脚本‘{plugin.pluginData.pluginName}’");
+        }
+        else
+        {
+            Debug.LogError("未拾取插件");
+        }
+    }
     
     void Test()
+    {
+        
+    }
+
+    public void RefreshPlugins()
     {
         
     }
