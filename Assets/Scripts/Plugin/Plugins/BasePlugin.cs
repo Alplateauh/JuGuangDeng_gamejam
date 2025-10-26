@@ -24,5 +24,13 @@ public abstract class BasePlugin
     public virtual void SetPlayer(Player player)
     {
         this.player = player;
+        if (player != null)
+        {
+            Effect();
+        }
+        else
+        {
+            RemoveEffect();
+        }
     }
 }

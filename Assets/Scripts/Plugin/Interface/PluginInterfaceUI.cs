@@ -30,6 +30,7 @@ public class PluginInterfaceUI : MonoBehaviour
     {
         if (pluginManager)
         {
+            Debug.Log("禁用跳跃");
             pluginManager.gameObject.GetComponent<Player>().OpenOrCloseJumpInputWindow(false);
         }
     }
@@ -38,6 +39,7 @@ public class PluginInterfaceUI : MonoBehaviour
     {
         if (pluginManager)
         {
+            Debug.Log("启动跳跃");
             pluginManager.gameObject.GetComponent<Player>().OpenOrCloseJumpInputWindow(true);
         }
     }
@@ -45,6 +47,8 @@ public class PluginInterfaceUI : MonoBehaviour
     public void SetManager(PluginManager pluginManager)
     {
         this.pluginManager = pluginManager;
+        Debug.Log("禁用跳跃");
+        pluginManager.gameObject.GetComponent<Player>().OpenOrCloseJumpInputWindow(false);
         ShowPlugin();
     }
 
@@ -57,24 +61,37 @@ public class PluginInterfaceUI : MonoBehaviour
         {
             if (!pluginManager.activePlugins.Contains(plugin))
             {
+                inactiveButton[inactive].gameObject.SetActive(true);
                 inactiveButton[inactive].interactable = true;
-                inactiveButton[inactive].image.sprite = plugin.pluginData.icon;
                 buttonOwnedPlugin[inactiveButton[inactive]] = plugin;
+                Image image = inactiveButton[inactive].GetComponent<Image>();
+                //image.sprite = plugin.pluginData.icon;
+                image.color = plugin.pluginData.color;
+                Debug.Log("Color:"+image.color);
                 inactive++;
             }
         }
 
         foreach (BasePlugin plugin in pluginManager.activePlugins)
         {
+            inactiveButton[active].gameObject.SetActive(true);
             activeButton[active].interactable = true;
-            activeButton[active].image.sprite = plugin.pluginData.icon;
             buttonOwnedPlugin[activeButton[active]] = plugin;
+            Image image = activeButton[active].GetComponent<Image>();
+            //image.sprite = plugin.pluginData.icon;
+            image.color = plugin.pluginData.color;
+            Debug.Log("Color:"+image.color);
             active++;
         }
         
-        if (active > 2)
+        if (active > 3)
         {
             Debug.LogError("激活插件过多");
+        }
+
+        for (; inactive < 6; inactive++)
+        {
+            inactiveButton[inactive].gameObject.SetActive(false);
         }
     }
 
@@ -90,9 +107,22 @@ public class PluginInterfaceUI : MonoBehaviour
         }
         else if (exchangeButton.Count == 1)
         {
-            BasePlugin plugin1 = buttonOwnedPlugin[exchangeButton[0]];
-            BasePlugin plugin2 = buttonOwnedPlugin[button];
-            pluginManager.ExchangePlugin(plugin1, plugin2);
+            if (buttonOwnedPlugin.ContainsKey(exchangeButton[0]) && buttonOwnedPlugin.ContainsKey(button))
+            {
+                BasePlugin plugin1 = buttonOwnedPlugin[exchangeButton[0]];
+                BasePlugin plugin2 = buttonOwnedPlugin[button];
+                pluginManager.ExchangePlugin(plugin1, plugin2);
+            }
+            else if (buttonOwnedPlugin.ContainsKey(button)&&activeButton.Contains(exchangeButton[0]))
+            {
+                BasePlugin plugin1 = buttonOwnedPlugin[button];
+                pluginManager.ActivePlugin(plugin1);
+            }
+            else if (buttonOwnedPlugin.ContainsKey(exchangeButton[0]) &&activeButton.Contains(button))
+            {
+                BasePlugin plugin1 = buttonOwnedPlugin[exchangeButton[0]];
+                pluginManager.ActivePlugin(plugin1);
+            }
             exchangeButton.Clear();
         }
         ShowPlugin();

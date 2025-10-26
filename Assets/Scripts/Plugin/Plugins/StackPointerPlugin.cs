@@ -20,17 +20,4 @@ public class StackPointerPlugin : BasePlugin
     {
         player.OpenOrCloseJumpInputWindow(false);
     }
-
-     public override void SetPlayer(Player player)
-     {
-         base.SetPlayer(player);
-         if (player != null)
-         {
-             Effect();
-         }
-         else
-         {
-             RemoveEffect();
-         }
-     }
 }
