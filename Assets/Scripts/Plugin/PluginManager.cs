@@ -45,6 +45,11 @@ public class PluginManager : MonoBehaviour
         {
             pickedPlugins.Add(pluginToActivate);
             Debug.Log($"插件 '{pluginToActivate.pluginData.pluginName}' 已被拾取。");
+            if (pluginToActivate.pluginData.autoActivate)
+            {
+                ActivePlugin(pluginToActivate);
+                Debug.Log($"尝试自动激活插件‘{pluginToActivate.pluginData.pluginName}’");
+            }
         }
         else
         {
@@ -175,6 +180,11 @@ public class PluginManager : MonoBehaviour
 
     public void ActivePlugin(BasePlugin plugin)
     {
+        if (activePlugins.Count == 3)
+        {
+            Debug.Log("激活插件达到上限");
+            return;
+        }
         if (pickedPlugins.Contains(plugin)&&!activePlugins.Contains(plugin))
         {
             activePlugins.Add(plugin);

@@ -12,4 +12,5 @@ public class PluginData : ScriptableObject
     public InteractionType interactionType;
     public Sprite icon;
     public Color color;
+    public bool autoActivate;
 }

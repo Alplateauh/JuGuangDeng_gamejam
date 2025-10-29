@@ -17,3 +17,4 @@ MonoBehaviour:
   description: 
   interactionType: 5
   icon: {fileID: 0}
+  color: {r: 0.76950324, g: 1, b: 0, a: 1}
